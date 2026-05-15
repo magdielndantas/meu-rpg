@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Player, GameState } from '../types';
+import type { Player, GameState } from '../types';
 import CardComponent from './CardComponent';
 import '../styles/shop.css';
 

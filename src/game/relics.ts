@@ -1,4 +1,4 @@
-import { Relic } from '../types';
+import type { GameState, Relic, CombatLog } from '../types';
 
 export const ALL_RELICS: Record<string, Relic> = {
   'vampiric_blood': {
@@ -8,7 +8,7 @@ export const ALL_RELICS: Record<string, Relic> = {
     icon: '🩸',
     effect: {
       trigger: 'onCombatStart',
-      action: (state) => {
+      action: (state: GameState) => {
         const newHp = Math.min(state.player.maxHp, state.player.hp + 3);
         return {
           ...state,
@@ -16,9 +16,9 @@ export const ALL_RELICS: Record<string, Relic> = {
           log: [{ 
             id: Math.random().toString(36).slice(2, 9), 
             message: 'Sangue de Vampiro curou 3 HP', 
-            type: 'heal' 
+            type: 'heal' as CombatLog['type']
           }, ...state.log].slice(0, 30)
-        };
+        } as GameState;
       }
     }
   },
@@ -29,7 +29,7 @@ export const ALL_RELICS: Record<string, Relic> = {
     icon: '🏋️',
     effect: {
       trigger: 'onCombatStart',
-      action: (state) => {
+      action: (state: GameState) => {
         return {
           ...state,
           player: { 
@@ -39,9 +39,9 @@ export const ALL_RELICS: Record<string, Relic> = {
           log: [{ 
             id: Math.random().toString(36).slice(2, 9), 
             message: 'Peso de Treino concedeu 1 de Força', 
-            type: 'status' 
+            type: 'status' as CombatLog['type']
           }, ...state.log].slice(0, 30)
-        };
+        } as GameState;
       }
     }
   },
@@ -52,16 +52,16 @@ export const ALL_RELICS: Record<string, Relic> = {
     icon: '💍',
     effect: {
       trigger: 'onTurnStart',
-      action: (state) => {
+      action: (state: GameState) => {
         return {
           ...state,
           player: { ...state.player, energy: state.player.energy + 1 },
           log: [{ 
             id: Math.random().toString(36).slice(2, 9), 
             message: 'Anel Energético concedeu 1 de Energia', 
-            type: 'system' 
+            type: 'system' as CombatLog['type']
           }, ...state.log].slice(0, 30)
-        };
+        } as GameState;
       }
     }
   }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { GameState, MapNode } from '../types';
+import type { GameState, MapNode } from '../types';
 import '../styles/map.css';
 
 interface MapScreenProps {

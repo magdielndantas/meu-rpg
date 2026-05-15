@@ -466,13 +466,12 @@ export function restHeal(state: GameState): GameState {
   const healAmount = Math.floor(state.player.maxHp * 0.3);
   const newHp = Math.min(state.player.maxHp, state.player.hp + healAmount);
   
-  let s = {
+  const intermediateState: GameState = {
     ...state,
     player: { ...state.player, hp: newHp },
-    phase: 'map' as const,
+    phase: 'map',
   };
-  s = log(s, `Você descansou e recuperou ${healAmount} de HP`, 'heal');
-  return s;
+  return log(intermediateState, `Você descansou e recuperou ${healAmount} de HP`, 'heal');
 }
 
 export function restUpgrade(state: GameState, cardId: string): GameState {
@@ -488,16 +487,15 @@ export function restUpgrade(state: GameState, cardId: string): GameState {
     name: `${card.name}+`,
     upgraded: true,
     description: upgradeDescription(card.id, card.description),
-    effects: upgradeEffects(card.id, card.effects),
+    effects: upgradeEffects(card.effects),
   };
 
-  let s = {
+  const intermediateState: GameState = {
     ...state,
     player: { ...state.player, deck: newDeck },
-    phase: 'map' as const,
+    phase: 'map',
   };
-  s = log(s, `Você aprimorou "${card.name}" para "${newDeck[cardIndex].name}"`, 'system');
-  return s;
+  return log(intermediateState, `Você aprimorou "${card.name}" para "${newDeck[cardIndex].name}"`, 'system');
 }
 
 function upgradeDescription(id: string, current: string): string {
@@ -507,7 +505,7 @@ function upgradeDescription(id: string, current: string): string {
   return `${current} (Aprimorada)`;
 }
 
-function upgradeEffects(id: string, effects: Card['effects']): Card['effects'] {
+function upgradeEffects(effects: Card['effects']): Card['effects'] {
   return effects.map(e => {
     if (e.damage) return { ...e, damage: Math.floor(e.damage * 1.5) };
     if (e.block) return { ...e, block: Math.floor(e.block * 1.5) };
