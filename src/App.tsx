@@ -1,11 +1,14 @@
 import { useState, useCallback } from 'react';
 import type { GameState, Card } from './types';
-import { createInitialState, playCard, endTurn, collectReward } from './game/engine';
+import { createInitialState, playCard, endTurn, collectReward, selectNode, restHeal, restUpgrade, buyCard, removeCard, leaveShop } from './game/engine';
 import CardComponent from './components/CardComponent';
 import EnemyComponent from './components/EnemyComponent';
 import PlayerStats from './components/PlayerStats';
 import CombatLog from './components/CombatLog';
 import RewardScreen from './components/RewardScreen';
+import MapScreen from './components/MapScreen';
+import RestScreen from './components/RestScreen';
+import ShopScreen from './components/ShopScreen';
 import './App.css';
 
 export default function App() {
@@ -41,9 +44,86 @@ export default function App() {
     setGame(g => collectReward(g, card));
   }, []);
 
+  const handleSelectNode = useCallback((nodeId: string) => {
+    setGame(g => selectNode(g, nodeId));
+  }, []);
+
+  const handleHeal = useCallback(() => {
+    setGame(g => restHeal(g));
+  }, []);
+
+  const handleUpgrade = useCallback((cardId: string) => {
+    setGame(g => restUpgrade(g, cardId));
+  }, []);
+
+  const handleBuyCard = useCallback((cardId: string) => {
+    setGame(g => buyCard(g, cardId));
+  }, []);
+
+  const handleRemoveCard = useCallback((cardId: string) => {
+    setGame(g => removeCard(g, cardId));
+  }, []);
+
+  const handleLeaveShop = useCallback(() => {
+    setGame(g => leaveShop(g));
+  }, []);
+
   const handleRestart = useCallback(() => {
     setGame(createInitialState());
   }, []);
+
+  if (game.phase === 'map') {
+    return (
+      <div className="app">
+        <header className="app-header">
+          <h1>RPG Deck Builder</h1>
+          <div className="player-overview">
+            <span>❤️ {game.player.hp}/{game.player.maxHp}</span>
+            <span>💰 {game.player.gold}</span>
+            <button className="deck-btn" onClick={() => setShowDeck(v => !v)}>
+              Deck ({game.player.deck.length})
+            </button>
+          </div>
+        </header>
+        <MapScreen state={game} onSelectNode={handleSelectNode} />
+        {showDeck && (
+          <div className="deck-overlay" onClick={() => setShowDeck(false)}>
+            <div className="deck-modal" onClick={e => e.stopPropagation()}>
+              <h3>Seu Deck ({game.player.deck.length} cartas)</h3>
+              <div className="deck-cards">
+                {game.player.deck.map((card, i) => (
+                  <CardComponent key={`${card.id}_${i}`} card={card} small />
+                ))}
+              </div>
+              <button onClick={() => setShowDeck(false)}>Fechar</button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (game.phase === 'rest') {
+    return (
+      <RestScreen 
+        player={game.player} 
+        onHeal={handleHeal} 
+        onUpgrade={handleUpgrade} 
+      />
+    );
+  }
+
+  if (game.phase === 'shop' && game.shopItems) {
+    return (
+      <ShopScreen
+        player={game.player}
+        shopItems={game.shopItems}
+        onBuyCard={handleBuyCard}
+        onRemoveCard={handleRemoveCard}
+        onLeave={handleLeaveShop}
+      />
+    );
+  }
 
   if (game.phase === 'victory' && game.enemies.length === 0) {
     return <RewardScreen floor={game.floor} onSelect={handleReward} />;

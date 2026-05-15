@@ -1,24 +1,58 @@
-import type { GameState, Player, Card, CombatLog, StatusEffect, GamePhase } from '../types';
-import { getStarterDeck } from './cards';
+import type { GameState, Player, Card, CombatLog, StatusEffect, GamePhase, MapNode, NodeType } from '../types';
+import { getStarterDeck, getRewardCards } from './cards';
 import { getEnemiesForFloor } from './enemies';
 
 function uid(): string {
   return Math.random().toString(36).slice(2, 9);
 }
 
-function log(state: GameState, message: string, type: CombatLog['type']): GameState {
-  return {
-    ...state,
-    log: [{ id: uid(), message, type }, ...state.log].slice(0, 30),
-  };
-}
+function generateMap(): MapNode[] {
+  const map: MapNode[] = [];
+  const floors = 15;
+  const nodesPerFloor = 3;
 
-function shuffle<T>(arr: T[]): T[] {
-  return [...arr].sort(() => Math.random() - 0.5);
+  // Generate nodes for each floor
+  for (let f = 1; f <= floors; f++) {
+    for (let i = 0; i < nodesPerFloor; i++) {
+      let type: NodeType = 'enemy';
+      if (f === floors) {
+        type = 'boss';
+        if (i > 0) continue; // Only one boss node
+      } else if (f % 5 === 0 && f !== floors) {
+        type = 'elite';
+      } else if (f % 3 === 0) {
+        type = Math.random() > 0.5 ? 'shop' : 'rest';
+      }
+
+      map.push({
+        id: `node_${f}_${i}`,
+        type,
+        floor: f,
+        connections: [],
+        position: { x: (i + 1) * 25, y: f * 60 },
+      });
+    }
+  }
+
+  // Connect nodes
+  for (let f = 1; f < floors; f++) {
+    const currentFloorNodes = map.filter(n => n.floor === f);
+    const nextFloorNodes = map.filter(n => n.floor === f + 1);
+
+    currentFloorNodes.forEach(node => {
+      // Connect each node to 1-2 random nodes in the next floor
+      const nextCount = Math.floor(Math.random() * 2) + 1;
+      const shuffledNext = shuffle(nextFloorNodes);
+      node.connections = shuffledNext.slice(0, nextCount).map(n => n.id);
+    });
+  }
+
+  return map;
 }
 
 export function createInitialState(): GameState {
   const deck = getStarterDeck();
+  const map = generateMap();
   const player: Player = {
     id: 'player',
     name: 'Herói',
@@ -33,21 +67,23 @@ export function createInitialState(): GameState {
     drawPile: shuffle(deck),
     discardPile: [],
     exhaustPile: [],
-    gold: 0,
+    gold: 50,
     relics: [],
   };
 
   const state: GameState = {
-    phase: 'player_turn',
+    phase: 'map',
     player,
-    enemies: getEnemiesForFloor(1),
+    enemies: [],
     turn: 1,
     log: [],
-    floor: 1,
+    floor: 0,
     selectedCard: null,
+    map,
+    currentNodeId: null,
   };
 
-  return startPlayerTurn(state);
+  return state;
 }
 
 function drawCards(player: Player, count: number): Player {
@@ -197,7 +233,7 @@ export function endTurn(state: GameState): GameState {
   if (state.phase !== 'player_turn') return state;
 
   let s = state;
-  let player = { ...s.player };
+  const player = { ...s.player };
 
   // Discard hand
   player.discardPile = [...player.discardPile, ...player.hand];
@@ -297,8 +333,160 @@ function runEnemyTurn(state: GameState): GameState {
   return s;
 }
 
+function log(state: GameState, message: string, type: CombatLog['type']): GameState {
+  return {
+    ...state,
+    log: [{ id: uid(), message, type }, ...state.log].slice(0, 30),
+  };
+}
+
+function shuffle<T>(arr: T[]): T[] {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
+
+export function selectNode(state: GameState, nodeId: string): GameState {
+  const node = state.map.find(n => n.id === nodeId);
+  if (!node) return state;
+
+  // Validation: can only select from floor 1 if currentNodeId is null,
+  // or a connected node if currentNodeId is set.
+  if (state.currentNodeId === null) {
+    if (node.floor !== 1) return state;
+  } else {
+    const currentNode = state.map.find(n => n.id === state.currentNodeId);
+    if (!currentNode?.connections.includes(nodeId)) return state;
+  }
+
+  let s: GameState = {
+    ...state,
+    currentNodeId: nodeId,
+    floor: node.floor,
+  };
+
+  if (node.type === 'enemy' || node.type === 'elite' || node.type === 'boss') {
+    s = {
+      ...s,
+      phase: 'player_turn',
+      enemies: getEnemiesForFloor(node.floor), // Simplified for now
+      turn: 1,
+    };
+    s = startPlayerTurn(s);
+  } else if (node.type === 'rest') {
+    s = { ...s, phase: 'rest' };
+  } else if (node.type === 'shop') {
+    const shopCards = getRewardCards(5).map(card => ({
+      card,
+      price: card.rarity === 'rare' ? 150 : card.rarity === 'uncommon' ? 75 : 50,
+    }));
+    s = { 
+      ...s, 
+      phase: 'shop',
+      shopItems: { cards: shopCards, removalPrice: 75 }
+    };
+  }
+
+  return s;
+}
+
+export function buyCard(state: GameState, cardId: string): GameState {
+  if (!state.shopItems) return state;
+  const item = state.shopItems.cards.find(c => c.card.id === cardId);
+  if (!item || state.player.gold < item.price) return state;
+
+  const player = { ...state.player };
+  player.gold -= item.price;
+  player.deck = [...player.deck, item.card];
+
+  let s: GameState = {
+    ...state,
+    player,
+    shopItems: {
+      ...state.shopItems,
+      cards: state.shopItems.cards.filter(c => c.card.id !== cardId)
+    }
+  };
+  s = log(s, `Você comprou "${item.card.name}" por ${item.price} de ouro`, 'system');
+  return s;
+}
+
+export function removeCard(state: GameState, cardId: string): GameState {
+  if (!state.shopItems || state.player.gold < state.shopItems.removalPrice) return state;
+
+  const player = { ...state.player };
+  player.gold -= state.shopItems.removalPrice;
+  player.deck = player.deck.filter(c => c.id !== cardId);
+
+  let s: GameState = {
+    ...state,
+    player,
+    shopItems: {
+      ...state.shopItems,
+      removalPrice: state.shopItems.removalPrice + 25 // Price increases each time
+    }
+  };
+  s = log(s, `Uma carta foi removida do seu deck`, 'system');
+  return s;
+}
+
+export function leaveShop(state: GameState): GameState {
+  return { ...state, phase: 'map', shopItems: undefined };
+}
+
+export function restHeal(state: GameState): GameState {
+  const healAmount = Math.floor(state.player.maxHp * 0.3);
+  const newHp = Math.min(state.player.maxHp, state.player.hp + healAmount);
+  
+  let s = {
+    ...state,
+    player: { ...state.player, hp: newHp },
+    phase: 'map' as const,
+  };
+  s = log(s, `Você descansou e recuperou ${healAmount} de HP`, 'heal');
+  return s;
+}
+
+export function restUpgrade(state: GameState, cardId: string): GameState {
+  const cardIndex = state.player.deck.findIndex(c => c.id === cardId);
+  if (cardIndex === -1) return state;
+
+  const newDeck = [...state.player.deck];
+  const card = newDeck[cardIndex];
+  
+  // Create upgraded version
+  newDeck[cardIndex] = {
+    ...card,
+    name: `${card.name}+`,
+    upgraded: true,
+    description: upgradeDescription(card.id, card.description),
+    effects: upgradeEffects(card.id, card.effects),
+  };
+
+  let s = {
+    ...state,
+    player: { ...state.player, deck: newDeck },
+    phase: 'map' as const,
+  };
+  s = log(s, `Você aprimorou "${card.name}" para "${newDeck[cardIndex].name}"`, 'system');
+  return s;
+}
+
+function upgradeDescription(id: string, current: string): string {
+  // Simple heuristic for now, ideally this would be in cards.ts
+  if (id.includes('strike')) return 'Causa 9 de dano.';
+  if (id.includes('defend')) return 'Ganha 8 de Bloqueio.';
+  return `${current} (Aprimorada)`;
+}
+
+function upgradeEffects(id: string, effects: Card['effects']): Card['effects'] {
+  return effects.map(e => {
+    if (e.damage) return { ...e, damage: Math.floor(e.damage * 1.5) };
+    if (e.block) return { ...e, block: Math.floor(e.block * 1.5) };
+    return e;
+  });
+}
+
 export function collectReward(state: GameState, card: Card | null): GameState {
-  let player = { ...state.player };
+  const player = { ...state.player };
 
   if (card) {
     player.deck = [...player.deck, card];
@@ -307,22 +495,12 @@ export function collectReward(state: GameState, card: Card | null): GameState {
 
   player.gold += 20 + state.floor * 5;
 
-  const nextFloor = state.floor + 1;
-  const enemies = getEnemiesForFloor(nextFloor);
-
-  let s: GameState = {
+  return {
     ...state,
     player,
-    enemies,
-    floor: nextFloor,
-    turn: 1,
-    phase: 'player_turn',
+    phase: 'map',
     log: [],
   };
-
-  s = log(s, `Andar ${nextFloor} — Nova batalha começa!`, 'system');
-  s = startPlayerTurn(s);
-  return s;
 }
 
 function statusLabel(effect: StatusEffect): string {

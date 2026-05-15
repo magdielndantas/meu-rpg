@@ -68,7 +68,17 @@ export interface EnemyAction {
   times?: number;
 }
 
-export type GamePhase = 'player_turn' | 'enemy_turn' | 'victory' | 'defeat' | 'reward' | 'map';
+export type GamePhase = 'player_turn' | 'enemy_turn' | 'victory' | 'defeat' | 'reward' | 'map' | 'rest' | 'shop';
+
+export type NodeType = 'enemy' | 'elite' | 'rest' | 'shop' | 'boss';
+
+export interface MapNode {
+  id: string;
+  type: NodeType;
+  floor: number;
+  connections: string[]; // IDs of next accessible nodes
+  position: { x: number; y: number }; // For visual rendering
+}
 
 export interface CombatLog {
   id: string;
@@ -84,4 +94,7 @@ export interface GameState {
   log: CombatLog[];
   floor: number;
   selectedCard: string | null;
+  map: MapNode[];
+  currentNodeId: string | null;
+  shopItems?: { cards: { card: Card; price: number }[]; removalPrice: number };
 }
