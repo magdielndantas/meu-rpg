@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { GameState, Card } from './types';
 import { createInitialState, playCard, endTurn, collectReward, selectNode, restHeal, restUpgrade, buyCard, removeCard, leaveShop } from './game/engine';
 import CardComponent from './components/CardComponent';
@@ -10,31 +10,91 @@ import MapScreen from './components/MapScreen';
 import RestScreen from './components/RestScreen';
 import ShopScreen from './components/ShopScreen';
 import './App.css';
+import './styles/floating-text.css';
+
+interface FloatingText {
+  id: string;
+  text: string;
+  x: number;
+  y: number;
+  type: 'damage' | 'block' | 'heal' | 'status';
+}
 
 export default function App() {
   const [game, setGame] = useState<GameState>(() => createInitialState());
   const [showDeck, setShowDeck] = useState(false);
+  const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
+  const [playedCard, setPlayedCard] = useState<Card | null>(null);
+  
+  const prevPlayerRef = useRef(game.player);
+  const prevEnemiesRef = useRef(game.enemies);
+
+  const addFloatingText = useCallback((text: string, x: number, y: number, type: FloatingText['type']) => {
+    const id = Math.random().toString(36).slice(2, 9);
+    setFloatingTexts(prev => [...prev, { id, text, x, y, type }]);
+    setTimeout(() => {
+      setFloatingTexts(prev => prev.filter(t => t.id !== id));
+    }, 1000);
+  }, []);
+
+  // Effect to detect changes and trigger floating text
+  useEffect(() => {
+    // Check player
+    const p = game.player;
+    const prevP = prevPlayerRef.current;
+    
+    if (p.hp < prevP.hp) addFloatingText(`-${prevP.hp - p.hp}`, 200, 400, 'damage');
+    if (p.hp > prevP.hp) addFloatingText(`+${p.hp - prevP.hp}`, 200, 400, 'heal');
+    if (p.block > prevP.block) addFloatingText(`+${p.block - prevP.block}`, 200, 350, 'block');
+
+    // Check enemies
+    game.enemies.forEach(e => {
+      const prevE = prevEnemiesRef.current.find(pe => pe.id === e.id);
+      if (prevE) {
+        if (e.hp < prevE.hp) addFloatingText(`-${prevE.hp - e.hp}`, 800, 300, 'damage');
+        if (e.block > prevE.block) addFloatingText(`+${e.block - prevE.block}`, 800, 250, 'block');
+      }
+    });
+
+    prevPlayerRef.current = p;
+    prevEnemiesRef.current = game.enemies;
+  }, [game.player, game.enemies, addFloatingText]);
 
   const handleCardClick = useCallback((cardId: string) => {
-    if (game.phase !== 'player_turn') return;
+    if (game.phase !== 'player_turn' || playedCard) return;
 
     if (game.selectedCard === cardId) {
       setGame(g => ({ ...g, selectedCard: null }));
       return;
     }
 
+    const card = game.player.hand.find(c => c.id === cardId);
+    if (!card) return;
+
     if (game.enemies.length === 1) {
-      setGame(g => playCard(g, cardId, game.enemies[0].id));
+      setPlayedCard(card);
+      setTimeout(() => {
+        setGame(g => playCard(g, cardId, game.enemies[0].id));
+        setPlayedCard(null);
+      }, 600);
       return;
     }
 
     setGame(g => ({ ...g, selectedCard: cardId }));
-  }, [game]);
+  }, [game, playedCard]);
 
   const handleEnemyClick = useCallback((enemyId: string) => {
-    if (game.phase !== 'player_turn' || !game.selectedCard) return;
-    setGame(g => playCard(g, g.selectedCard!, enemyId));
-  }, [game]);
+    if (game.phase !== 'player_turn' || !game.selectedCard || playedCard) return;
+    
+    const card = game.player.hand.find(c => c.id === game.selectedCard);
+    if (!card) return;
+
+    setPlayedCard(card);
+    setTimeout(() => {
+      setGame(g => playCard(g, g.selectedCard!, enemyId));
+      setPlayedCard(null);
+    }, 600);
+  }, [game, playedCard]);
 
   const handleEndTurn = useCallback(() => {
     setGame(g => endTurn(g));
@@ -131,6 +191,26 @@ export default function App() {
 
   return (
     <div className="app">
+      <div className="floating-text-container">
+        {floatingTexts.map(t => (
+          <div
+            key={t.id}
+            className={`floating-text ${t.type}`}
+            style={{ left: t.x, top: t.y }}
+          >
+            {t.text}
+          </div>
+        ))}
+      </div>
+
+      {playedCard && (
+        <div className="card-slam-overlay">
+          <div className="card-slam-animation">
+            <CardComponent card={playedCard} />
+          </div>
+        </div>
+      )}
+
       <header className="app-header">
         <h1>RPG Deck Builder</h1>
         <div className="floor-badge">Andar {game.floor}</div>

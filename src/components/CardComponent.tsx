@@ -9,39 +9,49 @@ interface Props {
   small?: boolean;
 }
 
-const typeColors: Record<string, string> = {
-  attack: '#c0392b',
-  skill: '#2980b9',
-  power: '#8e44ad',
-};
-
-const rarityBorder: Record<string, string> = {
-  common: '#555',
-  uncommon: '#27ae60',
-  rare: '#f39c12',
-};
-
 export default function CardComponent({ card, selected, disabled, onClick, small }: Props) {
+  const rarityClass = `rarity-${card.rarity}`;
+  const typeClass = `type-${card.type}`;
+  
   return (
     <div
-      className={`card ${selected ? 'selected' : ''} ${disabled ? 'disabled' : ''} ${small ? 'small' : ''}`}
-      style={{
-        borderColor: rarityBorder[card.rarity],
-        '--header-bg': typeColors[card.type],
-      } as React.CSSProperties}
+      className={`card ${selected ? 'selected' : ''} ${disabled ? 'disabled' : ''} ${small ? 'small' : ''} ${rarityClass} ${typeClass}`}
       onClick={disabled ? undefined : onClick}
     >
-      <div className="card-header">
-        <span className="card-name">{card.name}</span>
-        <span className="card-cost">{card.cost}</span>
+      <div className="card-inner">
+        <div className="card-mana-crystal">
+          <span className="mana-value">{card.cost}</span>
+        </div>
+        
+        <div className="card-frame">
+          <div className="card-name-banner">
+            <span className="card-name">{card.name}</span>
+          </div>
+          
+          <div className="card-art-box">
+            <div className="card-art-image">
+              {card.type === 'attack' && '⚔️'}
+              {card.type === 'skill' && '🛡️'}
+              {card.type === 'power' && '✨'}
+            </div>
+          </div>
+          
+          <div className="card-text-box">
+            <div className="card-description">
+              {card.description}
+            </div>
+          </div>
+          
+          <div className="card-footer">
+            <span className="card-type-label">{card.type.toUpperCase()}</span>
+            {card.upgraded && <span className="upgrade-star">★</span>}
+          </div>
+        </div>
+
+        {/* Decorative elements for TCG feel */}
+        <div className="card-glow"></div>
+        <div className="card-border-frame"></div>
       </div>
-      <div className="card-art">
-        {card.type === 'attack' && '⚔️'}
-        {card.type === 'skill' && '🛡️'}
-        {card.type === 'power' && '✨'}
-      </div>
-      <div className="card-desc">{card.description}</div>
-      <div className="card-type">{card.type.toUpperCase()}</div>
     </div>
   );
 }

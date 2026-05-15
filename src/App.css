@@ -6,6 +6,9 @@
 
 body {
   background: #0d0d1a;
+  background-image: 
+    radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0d0d1a 100%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   color: #eee;
   font-family: 'Segoe UI', system-ui, sans-serif;
   min-height: 100vh;
@@ -19,215 +22,147 @@ body {
   margin: 0 auto;
 }
 
+/* Header Stylized */
 .app-header {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 12px 24px;
-  background: #12122a;
-  border-bottom: 1px solid #2c3e50;
+  padding: 15px 30px;
+  background: linear-gradient(180deg, #16213e 0%, #0f0f1b 100%);
+  border-bottom: 2px solid #2c3e50;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
 
 .app-header h1 {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   color: #f1c40f;
+  text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
   flex: 1;
 }
 
-.floor-badge,
-.turn-badge {
-  background: #2c3e50;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  color: #aaa;
-}
-
+/* Battlefield - Playmat Vibe */
 .battlefield {
   display: grid;
-  grid-template-columns: 240px 1fr 240px;
-  gap: 16px;
-  padding: 16px 24px;
+  grid-template-columns: 280px 1fr 280px;
+  gap: 30px;
+  padding: 30px;
   flex: 1;
-  align-items: start;
+  align-items: center;
+  background: rgba(0,0,0,0.2);
+  margin: 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
 }
 
 .player-side {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-
-.pile-info {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  font-size: 0.8rem;
-  color: #888;
-}
-
-.pile-info span { cursor: default; }
-
-.deck-btn {
-  background: #2c3e50;
-  border: 1px solid #444;
-  color: #aaa;
-  padding: 4px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.75rem;
-  transition: background 0.2s;
-}
-
-.deck-btn:hover {
-  background: #34495e;
-  color: #eee;
-}
-
-.center-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  gap: 20px;
+  background: rgba(255,255,255,0.02);
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px dashed rgba(255,255,255,0.1);
 }
 
 .enemy-side {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
   align-items: center;
+  background: rgba(255,0,0,0.02);
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px dashed rgba(255,0,0,0.1);
 }
 
+/* Hand Area - Tray Vibe */
 .hand-area {
   display: flex;
-  align-items: flex-end;
-  gap: 16px;
-  padding: 16px 24px 24px;
-  background: #0a0a18;
-  border-top: 1px solid #1a1a2e;
-  min-height: 200px;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 40px;
+  background: linear-gradient(0deg, #0f0f1b 0%, #1a1a2e 100%);
+  border-top: 3px solid #2c3e50;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+  min-height: 250px;
 }
 
 .hand {
   display: flex;
-  gap: 8px;
+  gap: -20px; /* Slight overlap */
   flex: 1;
   align-items: flex-end;
-  overflow-x: auto;
-  padding-bottom: 8px;
+  justify-content: center;
+  padding: 20px 0;
 }
 
-.hand::-webkit-scrollbar { height: 4px; }
-.hand::-webkit-scrollbar-track { background: #111; }
-.hand::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
+.hand .card {
+  margin-left: -30px;
+  transition: all 0.2s ease-out;
+}
 
-.empty-hand {
-  color: #444;
-  font-style: italic;
-  font-size: 0.85rem;
-  padding: 40px;
-  text-align: center;
-  flex: 1;
+.hand .card:first-child { margin-left: 0; }
+
+.hand .card:hover {
+  margin-left: 0;
+  margin-right: 30px;
+}
+
+/* Card Slam Animation */
+.card-slam-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  background: rgba(0,0,0,0.3);
+  pointer-events: none;
+}
+
+.card-slam-animation {
+  animation: slam 0.6s cubic-bezier(.17,1.02,.43,1.15) forwards;
+}
+
+@keyframes slam {
+  0% {
+    transform: scale(0.5) translateY(200px);
+    opacity: 0;
+  }
+  30% {
+    transform: scale(1.4) translateY(0);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(1.4);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(-300px);
+    opacity: 0;
+  }
 }
 
 .end-turn-btn {
   background: linear-gradient(135deg, #f1c40f, #e67e22);
   color: #000;
-  border: none;
-  padding: 14px 28px;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: bold;
+  border: 4px solid #fff;
+  padding: 20px 40px;
+  border-radius: 50px;
+  font-size: 1.2rem;
+  font-weight: 900;
   cursor: pointer;
-  white-space: nowrap;
-  transition: transform 0.1s, box-shadow 0.1s;
-  flex-shrink: 0;
+  text-transform: uppercase;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+  transition: all 0.1s;
 }
 
 .end-turn-btn:hover {
-  transform: scale(1.03);
-  box-shadow: 0 4px 16px rgba(241, 196, 15, 0.4);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(241, 196, 15, 0.5);
 }
 
-.enemy-turn-indicator {
-  color: #e74c3c;
-  font-size: 0.9rem;
-  font-style: italic;
-  animation: pulse 1s ease-in-out infinite;
-  flex-shrink: 0;
+.end-turn-btn:active {
+  transform: translateY(2px);
 }
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
-.game-over {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 24px;
-  text-align: center;
-  flex: 1;
-}
-
-.game-over h2 { color: #e74c3c; font-size: 1.5rem; }
-
-.game-over button {
-  background: #e74c3c;
-  color: #fff;
-  border: none;
-  padding: 12px 28px;
-  border-radius: 6px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.game-over button:hover { background: #c0392b; }
-
-.deck-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-.deck-modal {
-  background: #12122a;
-  border: 2px solid #2c3e50;
-  border-radius: 12px;
-  padding: 24px;
-  max-width: 90vw;
-  max-height: 80vh;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.deck-modal h3 { color: #f1c40f; font-size: 1.1rem; }
-
-.deck-cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-}
-
-.deck-modal button {
-  align-self: center;
-  background: #2c3e50;
-  border: 1px solid #444;
-  color: #eee;
-  padding: 8px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.deck-modal button:hover { background: #34495e; }

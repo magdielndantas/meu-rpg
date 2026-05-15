@@ -1,0 +1,47 @@
+.floating-text-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+}
+
+.floating-text {
+  position: absolute;
+  font-weight: 900;
+  font-size: 2.5rem;
+  text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 0 4px 10px rgba(0,0,0,0.5);
+  animation: float-up-fade 1s ease-out forwards;
+  white-space: nowrap;
+}
+
+.floating-text.damage {
+  color: #ff4757;
+}
+
+.floating-text.block {
+  color: #74b9ff;
+}
+
+.floating-text.heal {
+  color: #2ecc71;
+}
+
+.floating-text.status {
+  color: #f1c40f;
+  font-size: 1.5rem;
+}
+
+@keyframes float-up-fade {
+  0% {
+    transform: translate(-50%, 0) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    transform: translate(-50%, -40px) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -120px) scale(1);
+    opacity: 0;
+  }
+}
