@@ -1,0 +1,55 @@
+.reward-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #0d0d1a;
+  color: #eee;
+  gap: 24px;
+  padding: 24px;
+}
+
+.reward-screen h2 {
+  font-size: 1.8rem;
+  color: #f1c40f;
+  margin: 0;
+}
+
+.reward-screen p {
+  color: #aaa;
+  margin: 0;
+}
+
+.reward-cards {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.reward-cards .card {
+  width: 150px;
+  min-height: 200px;
+  font-size: 1rem;
+}
+
+.reward-cards .card-art {
+  font-size: 3rem;
+}
+
+.skip-btn {
+  background: transparent;
+  border: 2px solid #555;
+  color: #888;
+  padding: 10px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.skip-btn:hover {
+  border-color: #aaa;
+  color: #eee;
+}

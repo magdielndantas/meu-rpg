@@ -1,0 +1,100 @@
+.card {
+  width: 120px;
+  min-height: 160px;
+  border: 2px solid #555;
+  border-radius: 8px;
+  background: #1a1a2e;
+  color: #eee;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.card:hover:not(.disabled) {
+  transform: translateY(-20px) scale(1.05);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  z-index: 10;
+}
+
+.card.selected {
+  transform: translateY(-24px) scale(1.08);
+  box-shadow: 0 0 0 3px #f1c40f, 0 8px 24px rgba(0,0,0,0.6);
+  z-index: 10;
+}
+
+.card.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.card.small {
+  width: 90px;
+  min-height: 120px;
+  font-size: 0.75em;
+}
+
+.card-header {
+  background: var(--header-bg, #555);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 6px;
+}
+
+.card-name {
+  font-size: 0.7rem;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.card-cost {
+  background: #f1c40f;
+  color: #000;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.card-art {
+  font-size: 2rem;
+  text-align: center;
+  padding: 8px 0;
+  background: #0f0f23;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card.small .card-art {
+  font-size: 1.4rem;
+  padding: 4px 0;
+}
+
+.card-desc {
+  font-size: 0.65rem;
+  padding: 4px 6px;
+  color: #ccc;
+  line-height: 1.3;
+  text-align: center;
+  min-height: 36px;
+}
+
+.card-type {
+  font-size: 0.55rem;
+  text-align: center;
+  padding: 2px;
+  background: rgba(0,0,0,0.3);
+  color: #999;
+  letter-spacing: 1px;
+}
