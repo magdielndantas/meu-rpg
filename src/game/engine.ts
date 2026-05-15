@@ -1,6 +1,7 @@
 import type { GameState, Player, Card, CombatLog, StatusEffect, GamePhase, MapNode, NodeType } from '../types';
 import { getStarterDeck, getRewardCards } from './cards';
 import { getEnemiesForFloor } from './enemies';
+import { ALL_RELICS, getRandomRelic } from './relics';
 
 function uid(): string {
   return Math.random().toString(36).slice(2, 9);
@@ -81,6 +82,7 @@ export function createInitialState(): GameState {
     selectedCard: null,
     map,
     currentNodeId: null,
+    relicReward: null,
   };
 
   return state;
@@ -119,6 +121,7 @@ function startPlayerTurn(state: GameState): GameState {
   });
 
   let s: GameState = { ...state, player, enemies, phase: 'player_turn' };
+  s = triggerRelics(s, 'onTurnStart');
   s = log(s, `--- Turno ${state.turn} ---`, 'system');
   return s;
 }
@@ -222,11 +225,18 @@ export function playCard(state: GameState, cardId: string, targetId: string): Ga
   }
 
   const newPhase: GamePhase = enemies.length === 0 ? 'victory' : s.phase;
+  let relicReward = s.relicReward;
+
   if (enemies.length === 0) {
     s = log(s, 'Todos os inimigos foram derrotados!', 'system');
+    const currentNode = s.map.find(n => n.id === s.currentNodeId);
+    if (currentNode && (currentNode.type === 'elite' || currentNode.type === 'boss')) {
+      relicReward = getRandomRelic().id;
+      s = log(s, `Você encontrou uma relíquia!`, 'system');
+    }
   }
 
-  return { ...s, player, enemies, selectedCard: null, phase: newPhase };
+  return { ...s, player, enemies, selectedCard: null, phase: newPhase, relicReward };
 }
 
 export function endTurn(state: GameState): GameState {
@@ -320,11 +330,19 @@ function runEnemyTurn(state: GameState): GameState {
   enemies = enemies.filter(e => e.hp > 0);
 
   const phase: GamePhase = player.hp <= 0 ? 'defeat' : enemies.length === 0 ? 'victory' : 'player_turn';
+  let relicReward = s.relicReward;
 
   if (player.hp <= 0) s = log(s, 'Você foi derrotado...', 'system');
-  if (enemies.length === 0) s = log(s, 'Todos os inimigos foram derrotados!', 'system');
+  if (enemies.length === 0) {
+    s = log(s, 'Todos os inimigos foram derrotados!', 'system');
+    const currentNode = s.map.find(n => n.id === s.currentNodeId);
+    if (currentNode && (currentNode.type === 'elite' || currentNode.type === 'boss')) {
+      relicReward = getRandomRelic().id;
+      s = log(s, `Você encontrou uma relíquia!`, 'system');
+    }
+  }
 
-  s = { ...s, player, enemies, phase, turn: s.turn + 1 };
+  s = { ...s, player, enemies, phase, turn: s.turn + 1, relicReward };
 
   if (phase === 'player_turn') {
     s = startPlayerTurn(s);
@@ -342,6 +360,17 @@ function log(state: GameState, message: string, type: CombatLog['type']): GameSt
 
 function shuffle<T>(arr: T[]): T[] {
   return [...arr].sort(() => Math.random() - 0.5);
+}
+
+function triggerRelics(state: GameState, trigger: string): GameState {
+  let s = state;
+  for (const relicId of state.player.relics) {
+    const relic = ALL_RELICS[relicId];
+    if (relic && relic.effect.trigger === trigger) {
+      s = relic.effect.action(s);
+    }
+  }
+  return s;
 }
 
 export function selectNode(state: GameState, nodeId: string): GameState {
@@ -370,6 +399,7 @@ export function selectNode(state: GameState, nodeId: string): GameState {
       enemies: getEnemiesForFloor(node.floor), // Simplified for now
       turn: 1,
     };
+    s = triggerRelics(s, 'onCombatStart');
     s = startPlayerTurn(s);
   } else if (node.type === 'rest') {
     s = { ...s, phase: 'rest' };
@@ -493,6 +523,10 @@ export function collectReward(state: GameState, card: Card | null): GameState {
     player.discardPile = [...player.discardPile, card];
   }
 
+  if (state.relicReward) {
+    player.relics = [...player.relics, state.relicReward];
+  }
+
   player.gold += 20 + state.floor * 5;
 
   return {
@@ -500,6 +534,7 @@ export function collectReward(state: GameState, card: Card | null): GameState {
     player,
     phase: 'map',
     log: [],
+    relicReward: null,
   };
 }
 

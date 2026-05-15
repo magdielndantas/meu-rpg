@@ -31,6 +31,19 @@ export interface StatusState {
   strength: number;
 }
 
+export type RelicTrigger = 'onCombatStart' | 'onTurnStart' | 'onTurnEnd' | 'onCardPlayed';
+
+export interface Relic {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  effect: {
+    trigger: RelicTrigger;
+    action: (state: GameState) => GameState;
+  };
+}
+
 export interface Combatant {
   id: string;
   name: string;
@@ -96,5 +109,6 @@ export interface GameState {
   selectedCard: string | null;
   map: MapNode[];
   currentNodeId: string | null;
+  relicReward: string | null;
   shopItems?: { cards: { card: Card; price: number }[]; removalPrice: number };
 }

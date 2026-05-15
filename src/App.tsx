@@ -126,7 +126,7 @@ export default function App() {
   }
 
   if (game.phase === 'victory' && game.enemies.length === 0) {
-    return <RewardScreen floor={game.floor} onSelect={handleReward} />;
+    return <RewardScreen floor={game.floor} relicId={game.relicReward} onSelect={handleReward} />;
   }
 
   return (

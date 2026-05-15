@@ -1,4 +1,5 @@
 import type { Player } from '../types';
+import { getRelic } from '../game/relics';
 import '../styles/player.css';
 
 interface Props {
@@ -10,7 +11,20 @@ export default function PlayerStats({ player }: Props) {
 
   return (
     <div className="player-stats">
-      <div className="player-name">{player.name}</div>
+      <div className="player-header">
+        <div className="player-name">{player.name}</div>
+        <div className="player-relics">
+          {player.relics.map(id => {
+            const relic = getRelic(id);
+            if (!relic) return null;
+            return (
+              <span key={id} className="relic-icon" title={`${relic.name}: ${relic.description}`}>
+                {relic.icon}
+              </span>
+            );
+          })}
+        </div>
+      </div>
 
       <div className="hp-bar-container">
         <div className="hp-bar-fill" style={{ width: `${hpPercent}%` }} />
