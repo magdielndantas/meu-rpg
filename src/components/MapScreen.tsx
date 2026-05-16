@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import type { GameState, MapNode } from '../types';
 import '../styles/map.css';
 
@@ -156,22 +157,28 @@ const MapScreen: React.FC<MapScreenProps> = ({ state, onSelectNode }) => {
             const active = currentNodeId === node.id;
             const isPast = node.floor < currentFloor;
             const locked = !selectable && !active && node.floor > currentFloor;
+            const staggerDelay = node.floor * 0.025 + nodeIndex(node) * 0.015;
 
             return (
-              <div
+              <motion.div
                 key={node.id}
                 className={`map-node-wrapper type-${node.type}`}
                 style={{ position: 'absolute', left: x, top: y, transform: 'translate(-50%, -50%)' }}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 240, damping: 18, delay: staggerDelay }}
+                whileHover={selectable ? { scale: 1.15 } : {}}
               >
-                <div
+                <motion.div
                   className={`map-node type-${node.type}${active ? ' active' : ''}${selectable ? ' selectable' : ''}${isPast || locked ? ' disabled' : ''}`}
                   onClick={() => selectable && onSelectNode(node.id)}
                   title={getLabel(node.type)}
+                  whileTap={selectable ? { scale: 0.88 } : {}}
                 >
                   <span className="node-icon">{getIcon(node.type)}</span>
-                </div>
+                </motion.div>
                 <span className="node-label">{getLabel(node.type)}</span>
-              </div>
+              </motion.div>
             );
           })}
         </div>

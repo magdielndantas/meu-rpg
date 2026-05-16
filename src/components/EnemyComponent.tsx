@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { motion, useAnimation } from 'framer-motion';
 import type { Enemy } from '../types';
 import '../styles/enemy.css';
 
@@ -6,6 +7,7 @@ interface Props {
   enemy: Enemy;
   selected?: boolean;
   onClick?: () => void;
+  entranceDelay?: number;
 }
 
 const intentIcons: Record<Enemy['intent'], string> = {
@@ -15,26 +17,20 @@ const intentIcons: Record<Enemy['intent'], string> = {
   debuff: '💀',
 };
 
-/** Derive elemental / personality badges from enemy name keywords. */
 function getEnemyBadges(name: string): { label: string; color: string }[] {
   const n = name.toLowerCase();
   const badges: { label: string; color: string }[] = [];
-  if (n.includes('cultista') || n.includes('wraith') || n.includes('shadow')) {
+  if (n.includes('cultista') || n.includes('wraith') || n.includes('shadow'))
     badges.push({ label: 'Shadow', color: 'rgba(155,89,182,0.8)' });
-  }
-  if (n.includes('verme') || n.includes('gosma') || n.includes('slime')) {
+  if (n.includes('verme') || n.includes('gosma') || n.includes('slime'))
     badges.push({ label: 'Poison', color: 'rgba(46,204,113,0.8)' });
-  }
-  if (n.includes('guardião') || n.includes('guardian') || n.includes('boss')) {
+  if (n.includes('guardião') || n.includes('guardian') || n.includes('boss'))
     badges.push({ label: 'Elite', color: 'rgba(201,168,76,0.8)' });
-  }
-  if (n.includes('piolho') || n.includes('louse') || n.includes('archer')) {
+  if (n.includes('piolho') || n.includes('louse') || n.includes('archer'))
     badges.push({ label: 'Swift', color: 'rgba(0,210,255,0.8)' });
-  }
   return badges;
 }
 
-/** Pick a large emoji sprite based on the enemy name. */
 function getSprite(name: string): string {
   const n = name.toLowerCase();
   if (n.includes('cultista'))  return '🧙';
@@ -47,44 +43,54 @@ function getSprite(name: string): string {
   return '👾';
 }
 
-export default function EnemyComponent({ enemy, selected, onClick }: Props) {
+export default function EnemyComponent({ enemy, selected, onClick, entranceDelay = 0 }: Props) {
   const hpPercent = Math.max(0, (enemy.hp / enemy.maxHp) * 100);
-  const [isShaking, setIsShaking] = useState(false);
+  const controls = useAnimation();
   const prevHp = useRef(enemy.hp);
+  const [flashing, setFlashing] = useState(false);
   const badges = getEnemyBadges(enemy.name);
 
   useEffect(() => {
     if (enemy.hp < prevHp.current) {
-      setIsShaking(true);
-      const timer = setTimeout(() => setIsShaking(false), 500);
-      prevHp.current = enemy.hp;
-      return () => clearTimeout(timer);
+      setFlashing(true);
+      // Violent shake + recoil
+      controls.start({
+        x: [0, -14, 14, -10, 9, -6, 5, -3, 1, 0],
+        y: [0, -4,   3,  -3, 2,  0,  0,  0, 0, 0],
+        transition: { duration: 0.45, ease: 'easeInOut' },
+      });
+      setTimeout(() => setFlashing(false), 300);
     }
     prevHp.current = enemy.hp;
-  }, [enemy.hp]);
+  }, [enemy.hp, controls]);
 
   return (
-    <div
-      className={`enemy-container ${selected ? 'targeted' : ''} ${isShaking ? 'shake' : ''}`}
+    <motion.div
+      className={`enemy-container ${selected ? 'targeted' : ''}`}
+      animate={controls}
       onClick={onClick}
+      initial={{ opacity: 0, x: 60, scale: 0.9 }}
+      whileInView={{ opacity: 1, x: 0, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ type: 'spring', stiffness: 200, damping: 20, delay: entranceDelay }}
+      whileHover={selected ? { scale: 1.06 } : { scale: 1.03 }}
     >
-      {/* Name + HP bar + badges — above the art */}
+      {/* Name + HP + badges */}
       <div className="enemy-header">
         <h3 className="enemy-name">{enemy.name}</h3>
-
         <div className="enemy-hp-bar">
-          <div className="enemy-hp-fill" style={{ width: `${hpPercent}%` }} />
+          <motion.div
+            className="enemy-hp-fill"
+            animate={{ width: `${hpPercent}%` }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            style={{ width: `${hpPercent}%` }}
+          />
           <div className="enemy-hp-text">{enemy.hp}/{enemy.maxHp}</div>
         </div>
-
         {badges.length > 0 && (
           <div className="enemy-badges">
             {badges.map(b => (
-              <span
-                key={b.label}
-                className="enemy-badge"
-                style={{ borderColor: b.color, color: b.color }}
-              >
+              <span key={b.label} className="enemy-badge" style={{ borderColor: b.color, color: b.color }}>
                 {b.label}
               </span>
             ))}
@@ -92,27 +98,36 @@ export default function EnemyComponent({ enemy, selected, onClick }: Props) {
         )}
       </div>
 
-      {/* Art card with floating intent icon */}
+      {/* Art card */}
       <div className="enemy-card">
-        {/* Floating intent bubble */}
-        <div className="enemy-intent-bubble">
+        {/* Intent bubble */}
+        <motion.div
+          className="enemy-intent-bubble"
+          animate={{ y: [0, -7, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        >
           <span className="intent-icon">{intentIcons[enemy.intent]}</span>
           {enemy.intent === 'attack' && enemy.intentValue && (
             <span className="intent-value">{enemy.intentValue}</span>
           )}
-        </div>
+        </motion.div>
 
         {/* Sprite */}
         <div className="enemy-sprite">{getSprite(enemy.name)}</div>
 
         {/* Block badge */}
         {enemy.block > 0 && (
-          <div className="enemy-block-shield">
+          <motion.div
+            className="enemy-block-shield"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 18 }}
+          >
             <span className="block-value">{enemy.block}</span>
-          </div>
+          </motion.div>
         )}
 
-        {/* Status row */}
+        {/* Statuses */}
         {Object.values(enemy.status).some(v => v > 0) && (
           <div className="enemy-stats">
             <div className="enemy-statuses">
@@ -124,9 +139,17 @@ export default function EnemyComponent({ enemy, selected, onClick }: Props) {
             </div>
           </div>
         )}
-      </div>
 
-      {isShaking && <div className="hit-flash"></div>}
-    </div>
+        {/* Hit flash overlay */}
+        {flashing && (
+          <motion.div
+            className="hit-flash"
+            initial={{ opacity: 0.6 }}
+            animate={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          />
+        )}
+      </div>
+    </motion.div>
   );
 }
