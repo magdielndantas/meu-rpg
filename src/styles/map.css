@@ -1,104 +1,239 @@
-.map-container {
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: center;
-  padding: 80px 40px;
-  background: 
-    radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0d0d1a 100%),
-    url("https://www.transparenttextures.com/patterns/dark-matter.png");
-  min-height: calc(100vh - 80px);
-  color: #eee;
-  overflow-y: auto;
-  box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+/* ============================================================
+   Map Screen — Shadow Realm Chronicles visual
+   ============================================================ */
+
+/* ---- Keyframes ---- */
+@keyframes mapPulseGold {
+  0%   { box-shadow: 0 0 0 0 rgba(201,168,76,0.7), 0 0 10px rgba(201,168,76,0.4); border-color: var(--arcane-gold); }
+  70%  { box-shadow: 0 0 0 14px rgba(201,168,76,0), 0 0 20px rgba(201,168,76,0.2); border-color: var(--runic-gold); }
+  100% { box-shadow: 0 0 0 0 rgba(201,168,76,0), 0 0 10px rgba(201,168,76,0.4); border-color: var(--arcane-gold); }
 }
 
+@keyframes bossPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(230,57,70,0.8), 0 0 20px rgba(230,57,70,0.5); }
+  70%  { box-shadow: 0 0 0 18px rgba(230,57,70,0), 0 0 30px rgba(230,57,70,0.2); }
+  100% { box-shadow: 0 0 0 0 rgba(230,57,70,0), 0 0 20px rgba(230,57,70,0.5); }
+}
+
+@keyframes mistDrift {
+  0%   { opacity: 0.06; transform: translateX(0) scale(1); }
+  50%  { opacity: 0.12; transform: translateX(30px) scale(1.05); }
+  100% { opacity: 0.06; transform: translateX(0) scale(1); }
+}
+
+/* ---- Container ---- */
+.map-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 40px 40px;
+  background: radial-gradient(ellipse at 50% 30%, #1a1a2e 0%, #0a0a14 100%);
+  min-height: 100vh;
+  color: #eee;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Mist texture overlay */
+.map-container::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 40% at 20% 60%, rgba(155,89,182,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 30%, rgba(0,210,255,0.04) 0%, transparent 50%);
+  pointer-events: none;
+  animation: mistDrift 12s ease-in-out infinite;
+  z-index: 0;
+}
+
+/* ---- Header ---- */
 .map-header {
-  margin-bottom: 60px;
+  margin-bottom: 48px;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
 .map-header h1 {
-  font-family: var(--serif);
-  color: var(--gold);
-  font-size: 2.5rem;
+  font-family: var(--font-headline);
+  color: var(--arcane-gold);
+  font-size: 2.6rem;
   text-transform: uppercase;
-  letter-spacing: 4px;
-  margin-bottom: 10px;
-  text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+  letter-spacing: 6px;
+  margin-bottom: 8px;
+  text-shadow: 0 0 20px rgba(201,168,76,0.5), 0 4px 10px rgba(0,0,0,0.9);
 }
 
 .map-header p {
-  font-family: var(--sans);
-  color: #888;
-  letter-spacing: 1px;
+  font-family: var(--font-label);
+  color: #666;
+  letter-spacing: 2px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
 }
 
+/* Decorative gold divider under header */
+.map-header::after {
+  content: '';
+  display: block;
+  width: 200px;
+  height: 1px;
+  background: var(--gold-banner);
+  margin: 16px auto 0;
+  opacity: 0.7;
+}
+
+/* ---- Floor row ---- */
 .map-floor {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 80px;
-  margin-bottom: 80px;
+  margin-bottom: 16px;
   width: 100%;
+  max-width: 900px;
   position: relative;
+  z-index: 1;
 }
 
+/* Dashed connection line between floors */
+.map-floor-connector {
+  width: 2px;
+  height: 32px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--arcane-gold) 0px,
+    var(--arcane-gold) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  opacity: 0.4;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- Node wrapper (circle + label) ---- */
+.map-node-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---- Base node ---- */
 .map-node {
-  width: 70px;
-  height: 70px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  background: rgba(15, 15, 27, 0.8);
+  cursor: default;
+  background: rgba(10, 10, 20, 0.85);
   transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-  z-index: 2;
   position: relative;
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(4px);
 }
 
-.map-node::before {
-  content: '';
-  position: absolute;
-  inset: -5px;
-  border: 1px solid transparent;
-  border-radius: 50%;
-  transition: all 0.3s;
+/* ---- Type variants ---- */
+.map-node.type-enemy {
+  background: #3d0000;
+  border-color: var(--crimson-blood);
 }
 
-.map-node:hover:not(.disabled) {
-  transform: scale(1.2) translateY(-5px);
-  border-color: var(--gold);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.5), 0 0 20px rgba(241, 196, 15, 0.3);
+.map-node.type-elite {
+  width: 72px;
+  height: 72px;
+  background: #2a0050;
+  border-color: var(--void-purple);
+  box-shadow: 0 0 12px rgba(155,89,182,0.3);
 }
 
+.map-node.type-rest {
+  background: #3d1a00;
+  border-color: #e07000;
+}
+
+.map-node.type-shop {
+  background: #3d2a00;
+  border-color: var(--arcane-gold);
+}
+
+.map-node.type-boss {
+  width: 80px;
+  height: 80px;
+  background: #3d0000;
+  border-color: var(--dragon-red);
+  border-width: 3px;
+  animation: bossPulse 2s ease-in-out infinite;
+}
+
+/* ---- States ---- */
 .map-node.active {
-  border-color: var(--gold);
-  background: var(--gold);
-  color: #000;
-  box-shadow: 0 0 30px rgba(241, 196, 15, 0.6);
+  border-color: var(--runic-gold);
+  border-width: 3px;
+  box-shadow:
+    0 0 20px rgba(241,196,15,0.7),
+    0 0 40px rgba(241,196,15,0.3),
+    inset 0 0 10px rgba(241,196,15,0.1);
+}
+
+.map-node.selectable {
+  cursor: pointer;
+  animation: mapPulseGold 2.2s ease-in-out infinite;
+}
+
+.map-node.selectable:hover {
+  transform: scale(1.1);
 }
 
 .map-node.disabled {
-  opacity: 0.2;
+  opacity: 0.4;
   filter: grayscale(1);
   cursor: not-allowed;
 }
 
-.map-node.selectable {
-  border-color: var(--mana-blue);
-  box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
-  animation: mapPulse 2s infinite;
-}
-
-@keyframes mapPulse {
-  0% { box-shadow: 0 0 0 0 rgba(0, 210, 255, 0.4); border-color: var(--mana-blue); }
-  70% { box-shadow: 0 0 0 15px rgba(0, 210, 255, 0); border-color: #fff; }
-  100% { box-shadow: 0 0 0 0 rgba(0, 210, 255, 0); border-color: var(--mana-blue); }
-}
-
+/* ---- Icon ---- */
 .node-icon {
+  font-size: 26px;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.7));
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.map-node.type-boss .node-icon {
+  font-size: 32px;
+}
+
+.map-node.type-elite .node-icon {
   font-size: 28px;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+/* ---- Node label ---- */
+.node-label {
+  font-family: var(--font-label);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #666;
+  text-align: center;
+}
+
+.map-node.type-enemy  ~ .node-label,
+.map-node-wrapper.type-enemy  .node-label { color: rgba(230,57,70,0.7); }
+.map-node-wrapper.type-elite  .node-label { color: rgba(155,89,182,0.8); }
+.map-node-wrapper.type-rest   .node-label { color: rgba(224,112,0,0.8); }
+.map-node-wrapper.type-shop   .node-label { color: rgba(201,168,76,0.8); }
+.map-node-wrapper.type-boss   .node-label { color: var(--dragon-red); font-size: 11px; letter-spacing: 3px; }
+
+.map-node.selectable ~ .node-label {
+  color: var(--arcane-gold);
+}
+
+.map-node.active ~ .node-label {
+  color: var(--runic-gold);
 }

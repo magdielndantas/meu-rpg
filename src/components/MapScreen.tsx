@@ -23,39 +23,67 @@ const MapScreen: React.FC<MapScreenProps> = ({ state, onSelectNode }) => {
     switch (type) {
       case 'enemy': return '⚔️';
       case 'elite': return '💀';
-      case 'rest': return '🔥';
-      case 'shop': return '💰';
-      case 'boss': return '👹';
-      default: return '❓';
+      case 'rest':  return '🔥';
+      case 'shop':  return '🏪';
+      case 'boss':  return '👑';
+      default:      return '❓';
     }
   };
+
+  const getNodeLabel = (type: string) => {
+    switch (type) {
+      case 'enemy': return 'COMBAT';
+      case 'elite': return 'ELITE';
+      case 'rest':  return 'REST';
+      case 'shop':  return 'SHOP';
+      case 'boss':  return 'BOSS';
+      default:      return type.toUpperCase();
+    }
+  };
+
+  const currentNode = map.find(n => n.id === currentNodeId);
+  const currentFloor = currentNode?.floor ?? 0;
 
   return (
     <div className="map-container">
       <div className="map-header">
-        <h1>Mapa do Calabouço</h1>
-        <p>Escolha seu próximo destino</p>
+        <h1>Dungeon Map</h1>
+        <p>Choose your next destination</p>
       </div>
-      
-      {floors.map(floor => (
-        <div key={floor} className="map-floor">
-          {map.filter(n => n.floor === floor).map(node => {
-            const selectable = isNodeSelectable(node);
-            const active = currentNodeId === node.id;
-            const disabled = !selectable && !active && (currentNodeId !== null && node.floor >= (map.find(n => n.id === currentNodeId)?.floor || 0));
 
-            return (
-              <div
-                key={node.id}
-                className={`map-node ${active ? 'active' : ''} ${selectable ? 'selectable' : ''} ${disabled ? 'disabled' : ''}`}
-                onClick={() => selectable && onSelectNode(node.id)}
-                title={node.type.toUpperCase()}
-              >
-                <span className="node-icon">{getNodeIcon(node.type)}</span>
-              </div>
-            );
-          })}
-        </div>
+      {[...floors].reverse().map((floor, idx, arr) => (
+        <React.Fragment key={floor}>
+          <div className="map-floor">
+            {map.filter(n => n.floor === floor).map(node => {
+              const selectable = isNodeSelectable(node);
+              const active = currentNodeId === node.id;
+              const isPast = node.floor < currentFloor;
+              const isFutureLocked = !selectable && !active && node.floor > currentFloor;
+              const disabled = isPast || isFutureLocked;
+
+              return (
+                <div
+                  key={node.id}
+                  className={`map-node-wrapper type-${node.type}`}
+                >
+                  <div
+                    className={`map-node type-${node.type}${active ? ' active' : ''}${selectable ? ' selectable' : ''}${disabled ? ' disabled' : ''}`}
+                    onClick={() => selectable && onSelectNode(node.id)}
+                    title={getNodeLabel(node.type)}
+                  >
+                    <span className="node-icon">{getNodeIcon(node.type)}</span>
+                  </div>
+                  <span className="node-label">{getNodeLabel(node.type)}</span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Connector between floors (not after last/topmost floor) */}
+          {idx < arr.length - 1 && (
+            <div className="map-floor-connector" />
+          )}
+        </React.Fragment>
       ))}
     </div>
   );

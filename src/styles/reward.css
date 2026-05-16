@@ -1,104 +1,200 @@
+/* ============================================================
+   Reward Screen — Shadow Realm Chronicles visual
+   ============================================================ */
+
+/* ---- Particle keyframes ---- */
+@keyframes particleDrift {
+  0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.6; }
+  100% { transform: translateY(-120px) translateX(40px) scale(0.3); opacity: 0; }
+}
+
+@keyframes particleDrift2 {
+  0%   { transform: translateY(0) translateX(0) scale(0.8); opacity: 0; }
+  10%  { opacity: 0.8; }
+  90%  { opacity: 0.4; }
+  100% { transform: translateY(-100px) translateX(-60px) scale(0.2); opacity: 0; }
+}
+
+@keyframes victoryGlow {
+  0%, 100% { text-shadow: 0 0 20px rgba(201,168,76,0.8), 0 0 40px rgba(201,168,76,0.4), 0 4px 10px rgba(0,0,0,0.9); }
+  50%       { text-shadow: 0 0 35px rgba(241,196,15,1),   0 0 70px rgba(241,196,15,0.5), 0 4px 10px rgba(0,0,0,0.9); }
+}
+
+@keyframes cardAppear {
+  from { opacity: 0; transform: translateY(30px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* ---- Screen layout ---- */
 .reward-screen {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: 
-    radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0d0d1a 100%),
-    url("https://www.transparenttextures.com/patterns/dark-matter.png");
+  background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%);
   color: #eee;
-  gap: 32px;
-  padding: 40px;
-  box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+  gap: 36px;
+  padding: 60px 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Gold particle pseudo-elements */
+.reward-screen::before,
+.reward-screen::after {
+  content: '✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦';
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--arcane-gold);
+  letter-spacing: 24px;
+  pointer-events: none;
+  animation: particleDrift 6s ease-in-out infinite;
+  opacity: 0;
+  z-index: 0;
+  white-space: nowrap;
+}
+
+.reward-screen::after {
+  top: 55%;
+  left: 40%;
+  letter-spacing: 40px;
+  animation: particleDrift2 8s ease-in-out 2s infinite;
+  color: var(--runic-gold);
+  font-size: 8px;
+}
+
+/* ---- Header ---- */
+.reward-header {
+  text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
 .reward-screen h2 {
-  font-family: var(--serif);
-  font-size: 2.2rem;
-  color: var(--gold);
+  font-family: var(--font-headline);
+  font-size: 3.5rem;
+  color: var(--arcane-gold);
   text-transform: uppercase;
+  letter-spacing: 6px;
+  margin: 0 0 12px;
+  animation: victoryGlow 3s ease-in-out infinite;
+}
+
+.reward-screen .reward-subtitle {
+  font-family: var(--font-label);
+  color: #777;
   letter-spacing: 2px;
-  text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+  font-size: 0.9rem;
+  text-transform: uppercase;
   margin: 0;
 }
 
-.reward-screen p {
-  font-family: var(--sans);
-  color: #aaa;
-  margin: 0;
-  letter-spacing: 1px;
-}
-
+/* ---- Card row ---- */
 .reward-cards {
   display: flex;
-  gap: 32px;
+  gap: 36px;
   flex-wrap: wrap;
   justify-content: center;
+  position: relative;
+  z-index: 1;
 }
 
+/* Staggered card entrance */
+.reward-cards > *:nth-child(1) { animation: cardAppear 0.5s ease 0.1s both; }
+.reward-cards > *:nth-child(2) { animation: cardAppear 0.5s ease 0.25s both; }
+.reward-cards > *:nth-child(3) { animation: cardAppear 0.5s ease 0.4s both; }
+
+/* Override card hover for reward context */
+.reward-cards .card:hover:not(.disabled) .card-inner {
+  border-color: var(--arcane-gold);
+  box-shadow: var(--shadow-card), var(--shadow-glow-gold);
+}
+
+.reward-cards .card:hover:not(.disabled) {
+  transform: scale(1.08) translateY(-6px);
+}
+
+/* ---- Relic reward panel ---- */
 .relic-reward {
-  background: rgba(15, 15, 27, 0.6);
-  border: 1px solid var(--gold);
-  border-radius: 12px;
-  padding: 24px;
+  background: rgba(30, 24, 8, 0.7);
+  border: 1px solid var(--arcane-gold);
+  border-radius: 10px;
+  padding: 24px 32px;
   width: 100%;
-  max-width: 600px;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(241, 196, 15, 0.1);
+  max-width: 560px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 0 30px rgba(201,168,76,0.06), var(--shadow-glow-gold);
   backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 1;
 }
 
 .relic-reward h3 {
-  font-family: var(--serif);
-  font-size: 1.2rem;
-  color: var(--gold);
-  margin-bottom: 20px;
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  color: var(--arcane-gold);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 16px;
+  text-align: center;
+  opacity: 0.8;
 }
 
 .relic-card {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
   text-align: left;
 }
 
 .relic-reward-icon {
-  font-size: 4rem;
-  filter: drop-shadow(0 0 15px rgba(241, 196, 15, 0.4));
+  font-size: 3.5rem;
+  filter: drop-shadow(0 0 15px rgba(201,168,76,0.6));
+  flex-shrink: 0;
 }
 
 .relic-reward-info strong {
   display: block;
-  font-family: var(--serif);
-  font-size: 1.3rem;
-  color: var(--gold);
-  margin-bottom: 4px;
+  font-family: var(--font-headline);
+  font-size: 1.2rem;
+  color: var(--arcane-gold);
+  margin-bottom: 6px;
 }
 
 .relic-reward-info p {
   margin: 0;
-  font-size: 1rem;
-  color: #ccc !important;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: #aaa;
   font-style: italic;
+  line-height: 1.5;
 }
 
+/* ---- Skip button ---- */
 .skip-btn {
   background: transparent;
-  border: 1px solid #444;
-  color: #666;
-  padding: 12px 32px;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #555;
+  padding: 12px 36px;
   border-radius: 4px;
   cursor: pointer;
-  font-family: var(--sans);
-  font-size: 1rem;
+  font-family: var(--font-label);
+  font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
+  font-style: italic;
   transition: all 0.3s;
+  position: relative;
+  z-index: 1;
 }
 
 .skip-btn:hover {
-  border-color: #888;
-  color: #aaa;
-  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.3);
+  color: #888;
+  background: rgba(255,255,255,0.04);
 }

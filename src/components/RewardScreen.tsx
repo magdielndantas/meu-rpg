@@ -17,11 +17,14 @@ export default function RewardScreen({ floor, relicId, onSelect }: Props) {
 
   return (
     <div className="reward-screen">
-      <h2>⚔️ Vitória! Andar {floor} completo</h2>
-      
+      <div className="reward-header">
+        <h2>Victory!</h2>
+        <p className="reward-subtitle">Floor {floor} cleared — choose a card to add to your deck</p>
+      </div>
+
       {relic && (
         <div className="relic-reward">
-          <h3>Você encontrou uma relíquia!</h3>
+          <h3>A relic has been found!</h3>
           <div className="relic-card">
             <span className="relic-reward-icon">{relic.icon}</span>
             <div className="relic-reward-info">
@@ -32,14 +35,14 @@ export default function RewardScreen({ floor, relicId, onSelect }: Props) {
         </div>
       )}
 
-      <p>Escolha uma carta para adicionar ao seu deck:</p>
       <div className="reward-cards">
         {cards.map(card => (
           <CardComponent key={card.id} card={card} onClick={() => onSelect(card)} />
         ))}
       </div>
+
       <button className="skip-btn" onClick={() => onSelect(null)}>
-        Pular recompensa
+        Skip Reward
       </button>
     </div>
   );
