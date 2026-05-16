@@ -10,6 +10,20 @@
   position: relative;
 }
 
+/* Map phase — allow horizontal scroll inside map-trail-scroll */
+.app.app--map {
+  overflow: hidden;
+}
+
+.map-phase-content {
+  flex: 1;
+  margin-top: 48px;
+  height: calc(100vh - 48px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 /* ----------------------------------------------------------
    TOP BAR (relics / header)
    ---------------------------------------------------------- */

@@ -1,5 +1,5 @@
 /* ============================================================
-   Map Screen — Shadow Realm Chronicles visual
+   Map Trail — Shadow Realm Chronicles visual
    ============================================================ */
 
 /* ---- Keyframes ---- */
@@ -21,97 +21,108 @@
   100% { opacity: 0.06; transform: translateX(0) scale(1); }
 }
 
-/* ---- Container ---- */
-.map-container {
+/* ---- Horizontal scroll wrapper ---- */
+.map-trail-scroll {
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: radial-gradient(ellipse at 50% 40%, #1a1a2e 0%, #0a0a14 100%);
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 60px 40px 40px;
-  background: radial-gradient(ellipse at 50% 30%, #1a1a2e 0%, #0a0a14 100%);
-  min-height: 100vh;
-  color: #eee;
-  overflow-y: auto;
-  position: relative;
 }
 
-/* Mist texture overlay */
-.map-container::before {
+/* Mist overlay */
+.map-trail-scroll::before {
   content: '';
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 40% at 20% 60%, rgba(155,89,182,0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 30%, rgba(0,210,255,0.04) 0%, transparent 50%);
+    radial-gradient(ellipse 80% 40% at 20% 60%, rgba(155,89,182,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 30%, rgba(0,210,255,0.03) 0%, transparent 50%);
   pointer-events: none;
-  animation: mistDrift 12s ease-in-out infinite;
+  animation: mistDrift 14s ease-in-out infinite;
   z-index: 0;
 }
 
-/* ---- Header ---- */
-.map-header {
-  margin-bottom: 48px;
-  text-align: center;
+/* Scrollbar theme for trail */
+.map-trail-scroll::-webkit-scrollbar        { height: 6px; }
+.map-trail-scroll::-webkit-scrollbar-track  { background: var(--void); }
+.map-trail-scroll::-webkit-scrollbar-thumb  { background: rgba(201,168,76,0.3); border-radius: 3px; }
+.map-trail-scroll::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,0.5); }
+
+/* ---- Inner container (centers vertically) ---- */
+.map-trail-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  padding: 24px 0 40px;
   position: relative;
   z-index: 1;
 }
 
-.map-header h1 {
+/* ---- Header ---- */
+.map-trail-header {
+  text-align: center;
+  margin-bottom: 32px;
+  flex-shrink: 0;
+}
+
+.map-trail-header h1 {
   font-family: var(--font-headline);
   color: var(--arcane-gold);
-  font-size: 2.6rem;
+  font-size: 2rem;
   text-transform: uppercase;
   letter-spacing: 6px;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   text-shadow: 0 0 20px rgba(201,168,76,0.5), 0 4px 10px rgba(0,0,0,0.9);
 }
 
-.map-header p {
+.map-trail-header p {
   font-family: var(--font-label);
-  color: #666;
-  letter-spacing: 2px;
-  font-size: 0.85rem;
+  color: #555;
+  letter-spacing: 3px;
+  font-size: 0.75rem;
   text-transform: uppercase;
 }
 
-/* Decorative gold divider under header */
-.map-header::after {
+.map-trail-header::after {
   content: '';
   display: block;
-  width: 200px;
+  width: 160px;
   height: 1px;
   background: var(--gold-banner);
-  margin: 16px auto 0;
-  opacity: 0.7;
+  margin: 12px auto 0;
+  opacity: 0.6;
 }
 
-/* ---- Floor row ---- */
-.map-floor {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 80px;
-  margin-bottom: 16px;
-  width: 100%;
-  max-width: 900px;
+/* ---- Canvas (absolutely positioned nodes + SVG) ---- */
+.map-trail-canvas {
   position: relative;
-  z-index: 1;
+  flex-shrink: 0;
 }
 
-/* Dashed connection line between floors */
-.map-floor-connector {
-  width: 2px;
-  height: 32px;
-  background: repeating-linear-gradient(
-    to bottom,
-    var(--arcane-gold) 0px,
-    var(--arcane-gold) 6px,
-    transparent 6px,
-    transparent 12px
-  );
-  opacity: 0.4;
-  margin: 0 auto;
-  position: relative;
-  z-index: 1;
+/* ---- SVG lines ---- */
+.map-trail-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ---- Floor number ticks ---- */
+.map-floor-tick {
+  position: absolute;
+  transform: translateX(-50%);
+  font-family: var(--font-label);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: rgba(201,168,76,0.25);
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* ---- Node wrapper (circle + label) ---- */
@@ -120,6 +131,7 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  z-index: 2;
 }
 
 /* ---- Base node ---- */
@@ -187,11 +199,11 @@
 }
 
 .map-node.selectable:hover {
-  transform: scale(1.1);
+  transform: scale(1.12);
 }
 
 .map-node.disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   filter: grayscale(1);
   cursor: not-allowed;
 }
@@ -205,35 +217,25 @@
   z-index: 1;
 }
 
-.map-node.type-boss .node-icon {
-  font-size: 32px;
-}
-
-.map-node.type-elite .node-icon {
-  font-size: 28px;
-}
+.map-node.type-boss .node-icon  { font-size: 32px; }
+.map-node.type-elite .node-icon { font-size: 28px; }
 
 /* ---- Node label ---- */
 .node-label {
   font-family: var(--font-label);
-  font-size: 10px;
+  font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: #666;
+  color: #555;
   text-align: center;
+  white-space: nowrap;
 }
 
-.map-node.type-enemy  ~ .node-label,
-.map-node-wrapper.type-enemy  .node-label { color: rgba(230,57,70,0.7); }
-.map-node-wrapper.type-elite  .node-label { color: rgba(155,89,182,0.8); }
-.map-node-wrapper.type-rest   .node-label { color: rgba(224,112,0,0.8); }
-.map-node-wrapper.type-shop   .node-label { color: rgba(201,168,76,0.8); }
-.map-node-wrapper.type-boss   .node-label { color: var(--dragon-red); font-size: 11px; letter-spacing: 3px; }
+.map-node-wrapper.type-enemy  .node-label { color: rgba(230,57,70,0.65); }
+.map-node-wrapper.type-elite  .node-label { color: rgba(155,89,182,0.75); }
+.map-node-wrapper.type-rest   .node-label { color: rgba(224,112,0,0.75); }
+.map-node-wrapper.type-shop   .node-label { color: rgba(201,168,76,0.75); }
+.map-node-wrapper.type-boss   .node-label { color: var(--dragon-red); font-size: 10px; letter-spacing: 3px; }
 
-.map-node.selectable ~ .node-label {
-  color: var(--arcane-gold);
-}
-
-.map-node.active ~ .node-label {
-  color: var(--runic-gold);
-}
+.map-node.selectable ~ .node-label { color: var(--arcane-gold); }
+.map-node.active     ~ .node-label { color: var(--runic-gold); }

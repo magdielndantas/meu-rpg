@@ -139,10 +139,9 @@ export default function App() {
   // ── MAP PHASE ─────────────────────────────────────────────
   if (game.phase === 'map') {
     return (
-      <div className="app">
+      <div className="app app--map">
         <header className="app-header">
           <h1>Shadow Realm Chronicles</h1>
-          {/* Relics as top-bar badges */}
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             {game.player.relics.map(id => {
               const relic = getRelic(id);
@@ -163,7 +162,7 @@ export default function App() {
             </button>
           </div>
         </header>
-        <div style={{ marginTop: 48 }}>
+        <div className="map-phase-content">
           <MapScreen state={game} onSelectNode={handleSelectNode} />
         </div>
         {showDeck && (
