@@ -21,6 +21,7 @@ export interface Card {
   effects: CardEffect[];
   upgraded?: boolean;
   exhausts?: boolean;
+  isAoE?: boolean;
 }
 
 export interface StatusState {

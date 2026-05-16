@@ -2,42 +2,71 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px;
-  background: #1a1a1a;
+  padding: 80px 40px;
+  background: 
+    radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0d0d1a 100%),
+    url("https://www.transparenttextures.com/patterns/dark-matter.png");
   min-height: 100vh;
-  color: white;
+  color: #eee;
+  box-shadow: inset 0 0 150px rgba(0,0,0,0.9);
 }
 
 .shop-header {
   display: flex;
   justify-content: space-between;
-  width: 100%;
-  max-width: 1200px;
-  margin-bottom: 40px;
-  border-bottom: 2px solid #444;
-  padding-bottom: 20px;
-}
-
-.shop-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 30px;
+  align-items: center;
   width: 100%;
   max-width: 1200px;
   margin-bottom: 60px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 30px;
+}
+
+.shop-header h1 {
+  font-family: var(--serif);
+  font-size: 2.8rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+}
+
+.shop-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 80px;
 }
 
 .shop-item {
   display: flex;
   flex-direction: column;
   align-items: center;
+  transition: transform 0.3s;
+}
+
+.shop-item:hover {
+  transform: translateY(-10px);
 }
 
 .price-tag {
-  margin-top: 15px;
+  margin-top: 20px;
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  color: var(--gold);
+  font-weight: 900;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.price-tag::before {
+  content: '💰';
   font-size: 1.2rem;
-  color: #ffcc00;
-  font-weight: bold;
 }
 
 .shop-services {
@@ -49,38 +78,61 @@
 }
 
 .service-card {
-  width: 300px;
-  background: #2a2a2a;
-  border: 2px solid #444;
-  border-radius: 15px;
-  padding: 30px;
+  width: 320px;
+  background: rgba(15, 15, 27, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 40px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  backdrop-filter: blur(10px);
 }
 
 .service-card:hover {
-  border-color: #00ccff;
-  background: #333;
+  border-color: var(--mana-blue);
+  background: rgba(22, 22, 40, 0.9);
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.6), 0 0 20px rgba(0, 210, 255, 0.2);
 }
 
 .service-icon {
-  font-size: 3rem;
-  margin-bottom: 20px;
+  font-size: 4rem;
+  margin-bottom: 24px;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+}
+
+.service-card h3 {
+  font-family: var(--serif);
+  color: var(--gold);
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.service-card p {
+  color: #888;
+  font-size: 0.9rem;
 }
 
 .leave-shop-btn {
-  margin-top: 60px;
-  padding: 15px 40px;
+  margin-top: 80px;
+  padding: 16px 48px;
+  font-family: var(--serif);
   font-size: 1.2rem;
-  background: #444;
-  color: white;
-  border: none;
-  border-radius: 5px;
+  font-weight: 900;
+  background: transparent;
+  color: #888;
+  border: 1px solid #444;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s;
 }
 
 .leave-shop-btn:hover {
-  background: #666;
+  border-color: #eee;
+  color: #eee;
+  background: rgba(255,255,255,0.05);
 }

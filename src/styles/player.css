@@ -1,52 +1,109 @@
+/* ============================================================
+   Player Stats Panel — Shadow Realm Chronicles visual
+   ============================================================ */
+
 .player-stats {
-  background: #1a1a2e;
-  border: 2px solid #2c3e50;
-  border-radius: 12px;
-  padding: 14px 18px;
-  min-width: 200px;
-  color: #eee;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: #e2e2e2;
 }
 
+/* ---- Hero Portrait ---- */
 .player-header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 8px;
+  gap: 8px;
+  position: relative;
+}
+
+.player-portrait {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid var(--arcane-gold);
+  box-shadow: var(--shadow-glow-gold);
+  background: var(--bg-slate);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  overflow: hidden;
 }
 
 .player-name {
-  font-weight: bold;
+  font-family: var(--font-headline);
+  font-weight: 700;
   font-size: 1rem;
+  color: var(--arcane-gold);
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
+/* Block badge below portrait */
+.player-block {
+  background: var(--bg-slate);
+  border: 1px solid var(--emerald-life);
+  border-radius: 20px;
+  padding: 3px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--emerald-life);
+  box-shadow: 0 0 8px rgba(46,204,113,0.3);
+}
+
+/* Relics row */
 .player-relics {
   display: flex;
-  gap: 4px;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .relic-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: rgba(18,18,30,0.8);
+  border: 1px solid rgba(201,168,76,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 1.2rem;
+  color: var(--arcane-gold);
   cursor: help;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .relic-icon:hover {
   transform: scale(1.2);
+  box-shadow: var(--shadow-glow-gold);
 }
 
+/* ---- HP Bar ---- */
 .hp-bar-container {
-  background: #333;
-  border-radius: 6px;
-  height: 18px;
+  width: 100%;
+  background: var(--void);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 20px;
+  height: 20px;
   position: relative;
   overflow: hidden;
-  margin-bottom: 4px;
+  box-shadow: 0 0 8px rgba(154,3,30,0.2) inset;
 }
 
 .hp-bar-fill {
-  background: linear-gradient(90deg, #e74c3c, #c0392b);
   height: 100%;
-  transition: width 0.3s;
+  background: var(--hp-gradient);
+  box-shadow: 0 0 10px rgba(154,3,30,0.5);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .hp-text {
@@ -55,50 +112,85 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: var(--font-body);
   font-size: 0.7rem;
-  font-weight: bold;
+  font-weight: 900;
   color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,1);
+  letter-spacing: 1px;
 }
 
-.player-block {
-  font-size: 0.8rem;
-  color: #74b9ff;
-  margin: 4px 0;
+/* ---- Mana Section ---- */
+.mana-section {
+  width: 100%;
+  background: rgba(26,26,46,0.5);
+  border: 1px solid rgba(0,210,255,0.2);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.mana-label {
+  font-family: var(--font-label);
+  font-size: 0.65rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--mana-blue);
+  font-weight: 700;
 }
 
 .energy-display {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 8px 0;
+  gap: 8px;
 }
 
 .energy-orb {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 2px solid #f1c40f;
-  transition: background 0.2s;
+  width: 24px;
+  height: 24px;
+  transform: rotate(45deg);
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.3s;
 }
 
 .energy-orb.full {
-  background: #f1c40f;
-  box-shadow: 0 0 6px rgba(241, 196, 15, 0.6);
-}
-
-.energy-orb.empty {
-  background: transparent;
+  background: var(--crystal-gradient);
+  box-shadow: var(--shadow-glow-blue);
+  border-color: #fff;
 }
 
 .energy-text {
-  font-size: 0.75rem;
-  color: #f1c40f;
-  font-weight: bold;
+  font-family: var(--font-headline);
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #fff;
+  margin-left: 4px;
 }
 
+/* ---- Status Effects ---- */
 .player-statuses {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 6px;
+  gap: 6px;
+  justify-content: center;
 }
+
+.status {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.1);
+  font-family: var(--font-body);
+}
+
+.status.burn       { border-color: rgba(230,57,70,0.5);  color: var(--dragon-red); }
+.status.poison     { border-color: rgba(46,204,113,0.5); color: var(--emerald-life); }
+.status.weak       { border-color: rgba(0,210,255,0.5);  color: var(--mana-blue); }
+.status.vuln       { border-color: rgba(154,3,30,0.5);   color: var(--crimson-blood); }
+.status.str        { border-color: rgba(201,168,76,0.5); color: var(--arcane-gold); }

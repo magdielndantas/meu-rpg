@@ -1,110 +1,62 @@
+/* ============================================================
+   Enemy Component — Shadow Realm Chronicles visual
+   ============================================================ */
+
 .enemy-container {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   cursor: pointer;
   transition: transform 0.2s;
   user-select: none;
 }
 
 .enemy-container:hover {
-  transform: scale(1.05);
-}
-
-.enemy-card {
-  background: linear-gradient(135deg, #1a1a2e, #16213e);
-  border: 3px solid #444;
-  border-radius: 15px;
-  padding: 15px;
-  width: 160px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-  position: relative;
-  overflow: hidden;
+  transform: scale(1.04);
 }
 
 .enemy-container.targeted .enemy-card {
-  border-color: #f1c40f;
-  box-shadow: 0 0 20px rgba(241, 196, 15, 0.4);
+  border-color: var(--arcane-gold) !important;
+  box-shadow: 0 0 20px rgba(201,168,76,0.5) !important;
 }
 
-/* Intent Bubble */
-.enemy-intent-bubble {
-  background: rgba(0, 0, 0, 0.8);
-  border: 2px solid #fff;
-  border-radius: 20px;
-  padding: 5px 12px;
+/* ---- Name + HP above the art ---- */
+.enemy-header {
+  text-align: center;
+  width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 5px;
-  animation: float 2s infinite ease-in-out;
-  z-index: 10;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  gap: 4px;
 }
 
-.intent-icon {
-  font-size: 1.2rem;
-}
-
-.intent-value {
-  color: #ff4757;
-  font-weight: bold;
-  font-size: 1.1rem;
-  text-shadow: 1px 1px 2px black;
-}
-
-/* Animations */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-@keyframes shake {
-  0% { transform: translate(1px, 1px) rotate(0deg); }
-  10% { transform: translate(-1px, -2px) rotate(-1deg); }
-  20% { transform: translate(-3px, 0px) rotate(1deg); }
-  30% { transform: translate(3px, 2px) rotate(0deg); }
-  40% { transform: translate(1px, -1px) rotate(1deg); }
-  50% { transform: translate(-1px, 2px) rotate(-1deg); }
-  60% { transform: translate(-3px, 1px) rotate(0deg); }
-  70% { transform: translate(3px, 1px) rotate(-1deg); }
-  80% { transform: translate(-1px, -1px) rotate(1deg); }
-  90% { transform: translate(1px, 2px) rotate(0deg); }
-  100% { transform: translate(1px, -2px) rotate(-1deg); }
-}
-
-.shake {
-  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-}
-
-/* Stats and Bars */
 .enemy-name {
-  font-weight: 900;
-  font-size: 0.9rem;
-  color: #fff;
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--arcane-gold);
   text-transform: uppercase;
-  margin-bottom: 8px;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(201,168,76,0.4);
 }
 
-.enemy-sprite {
-  font-size: 4rem;
-  margin-bottom: 10px;
-  filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
-}
-
+/* HP bar */
 .enemy-hp-bar {
-  background: #333;
-  height: 20px;
-  border-radius: 10px;
+  width: 160px;
+  background: var(--void);
+  border: 1px solid rgba(154,3,30,0.4);
+  border-radius: 4px;
+  height: 18px;
   position: relative;
   overflow: hidden;
-  border: 1px solid #000;
+  box-shadow: 0 0 6px rgba(154,3,30,0.2);
 }
 
 .enemy-hp-fill {
-  background: linear-gradient(90deg, #ff4757, #ff6b81);
   height: 100%;
+  background: var(--hp-gradient);
   transition: width 0.4s ease-out;
 }
 
@@ -114,45 +66,179 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
-  font-weight: bold;
-  color: white;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #fff;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
 
+/* Elemental / type badges */
+.enemy-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.enemy-badge {
+  padding: 2px 8px;
+  background: var(--void);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  font-family: var(--font-label);
+  font-size: 0.6rem;
+  letter-spacing: 1px;
+  color: #bbb;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ---- Intent bubble (floating above art) ---- */
+.enemy-intent-bubble {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10,10,20,0.9);
+  border: 1px solid rgba(154,3,30,0.8);
+  border-radius: 20px;
+  padding: 4px 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  animation: float 2s infinite ease-in-out;
+  z-index: 20;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  white-space: nowrap;
+}
+
+.intent-icon {
+  font-size: 1rem;
+}
+
+.intent-value {
+  color: var(--dragon-red);
+  font-family: var(--font-body);
+  font-weight: 900;
+  font-size: 0.9rem;
+  text-shadow: 1px 1px 2px black;
+}
+
+/* ---- Enemy "art" card ---- */
+.enemy-card {
+  position: relative;
+  width: 180px;
+  height: 220px;
+  background: var(--bg-slate);
+  border: 2px solid rgba(68,68,68,0.8);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.enemy-sprite {
+  font-size: 5rem;
+  filter: drop-shadow(0 5px 15px rgba(0,0,0,0.7));
+}
+
+/* Block shield badge */
 .enemy-block-shield {
   position: absolute;
-  bottom: 45px;
+  bottom: 10px;
   left: 10px;
-  background: #2f3542;
-  border: 2px solid #74b9ff;
+  background: var(--bg-slate);
+  border: 2px solid var(--mana-blue);
   border-radius: 50%;
-  width: 35px;
-  height: 35px;
+  width: 36px;
+  height: 36px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+  box-shadow: 0 0 8px rgba(0,210,255,0.4);
 }
 
 .block-value {
   font-size: 0.7rem;
-  font-weight: bold;
-  color: #74b9ff;
+  font-weight: 900;
+  color: var(--mana-blue);
+  font-family: var(--font-body);
 }
 
+/* Status effects row */
+.enemy-stats {
+  width: 100%;
+  padding: 0 6px 6px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.enemy-statuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+.status {
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.1);
+  font-family: var(--font-body);
+}
+
+.status.burn       { border-color: rgba(230,57,70,0.5);  color: var(--dragon-red); }
+.status.poison     { border-color: rgba(46,204,113,0.5); color: var(--emerald-life); }
+.status.weak       { border-color: rgba(0,210,255,0.5);  color: var(--mana-blue); }
+.status.vuln       { border-color: rgba(154,3,30,0.5);   color: var(--crimson-blood); }
+.status.str        { border-color: rgba(201,168,76,0.5); color: var(--arcane-gold); }
+
+/* ---- Hit flash ---- */
 .hit-flash {
   position: absolute;
   inset: 0;
-  background: rgba(255, 0, 0, 0.4);
+  background: rgba(255, 0, 0, 0.45);
   pointer-events: none;
-  border-radius: 15px;
+  border-radius: 12px;
   z-index: 5;
   animation: flash 0.3s ease-out forwards;
 }
 
+/* ---- Animations ---- */
+@keyframes float {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(-8px); }
+}
+
 @keyframes flash {
   from { opacity: 1; }
-  to { opacity: 0; }
+  to   { opacity: 0; }
+}
+
+@keyframes shake {
+  0%   { transform: translate(1px, 1px) rotate(0deg); }
+  10%  { transform: translate(-1px, -2px) rotate(-1deg); }
+  20%  { transform: translate(-3px, 0px) rotate(1deg); }
+  30%  { transform: translate(3px, 2px) rotate(0deg); }
+  40%  { transform: translate(1px, -1px) rotate(1deg); }
+  50%  { transform: translate(-1px, 2px) rotate(-1deg); }
+  60%  { transform: translate(-3px, 1px) rotate(0deg); }
+  70%  { transform: translate(3px, 1px) rotate(-1deg); }
+  80%  { transform: translate(-1px, -1px) rotate(1deg); }
+  90%  { transform: translate(1px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+.shake {
+  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
 }

@@ -1,5 +1,5 @@
 import type { GameState, Player, Card, CombatLog, StatusEffect, GamePhase, MapNode, NodeType } from '../types';
-import { getStarterDeck, getRewardCards } from './cards';
+import { getStarterDeck, getRewardCards, upgradeCard } from './cards';
 import { getEnemiesForFloor } from './enemies';
 import { ALL_RELICS, getRandomRelic } from './relics';
 
@@ -175,25 +175,37 @@ export function playCard(state: GameState, cardId: string, targetId: string): Ga
     }
 
     // Damage
-    if (effect.damage && target) {
-      let dmg = effect.damage + player.status.strength;
+    if (effect.damage !== undefined && (target || card.isAoE)) {
+      const targets = card.isAoE ? enemies : [target!];
+      
+      for (const t of targets) {
+        let dmg = effect.damage + player.status.strength;
 
-      // whirlwind: multiplier=2 means energy-based
+        // whirlwind: multiplier=2 means energy-based
+        if (effect.multiplier === 2) {
+          dmg = effect.damage * player.energy;
+          // energy is consumed after the loop if we want it to apply to all
+        }
+        // power strike: multiplier=1 means strength bonus is already added
+        if (effect.multiplier === 1) {
+          dmg = effect.damage + player.status.strength * 4;
+        }
+        // body slam: multiplier=3 means block-based
+        if (effect.multiplier === 3) {
+          dmg = player.block;
+        }
+
+        if (player.status.weak > 0) dmg = Math.floor(dmg * 0.75);
+
+        const result = applyDamage(t, dmg);
+        const idx = enemies.findIndex(e => e.id === t.id);
+        enemies[idx] = { ...enemies[idx], hp: result.hp, block: result.block };
+        s = log(s, `${t.name} recebeu ${result.damage} de dano`, 'damage');
+      }
+
       if (effect.multiplier === 2) {
-        dmg = effect.damage * player.energy;
         player.energy = 0;
       }
-      // power strike: multiplier=1 means strength bonus is already added
-      if (effect.multiplier === 1) {
-        dmg = effect.damage + player.status.strength * 4;
-      }
-
-      if (player.status.weak > 0) dmg = Math.floor(dmg * 0.75);
-
-      const result = applyDamage(target, dmg);
-      const idx = enemies.findIndex(e => e.id === targetId);
-      enemies[idx] = { ...enemies[idx], hp: result.hp, block: result.block };
-      s = log(s, `${target.name} recebeu ${result.damage} de dano`, 'damage');
     }
 
     // Apply status to enemy
@@ -236,7 +248,10 @@ export function playCard(state: GameState, cardId: string, targetId: string): Ga
     }
   }
 
-  return { ...s, player, enemies, selectedCard: null, phase: newPhase, relicReward };
+  let finalState: GameState = { ...s, player, enemies, selectedCard: null, phase: newPhase, relicReward };
+  finalState = triggerRelics(finalState, 'onCardPlayed');
+  
+  return finalState;
 }
 
 export function endTurn(state: GameState): GameState {
@@ -263,6 +278,7 @@ export function endTurn(state: GameState): GameState {
   }
 
   s = { ...s, player, phase: 'enemy_turn' };
+  s = triggerRelics(s, 'onTurnEnd');
   s = runEnemyTurn(s);
   return s;
 }
@@ -479,39 +495,22 @@ export function restUpgrade(state: GameState, cardId: string): GameState {
   if (cardIndex === -1) return state;
 
   const newDeck = [...state.player.deck];
-  const card = newDeck[cardIndex];
-  
-  // Create upgraded version
-  newDeck[cardIndex] = {
-    ...card,
-    name: `${card.name}+`,
-    upgraded: true,
-    description: upgradeDescription(card.id, card.description),
-    effects: upgradeEffects(card.effects),
-  };
+  const oldCard = newDeck[cardIndex];
+  const newCard = upgradeCard(oldCard);
+  newDeck[cardIndex] = newCard;
 
   const intermediateState: GameState = {
     ...state,
     player: { ...state.player, deck: newDeck },
     phase: 'map',
   };
-  return log(intermediateState, `Você aprimorou "${card.name}" para "${newDeck[cardIndex].name}"`, 'system');
+  return log(intermediateState, `Você aprimorou "${oldCard.name}" para "${newCard.name}"`, 'system');
 }
 
-function upgradeDescription(id: string, current: string): string {
-  // Simple heuristic for now, ideally this would be in cards.ts
-  if (id.includes('strike')) return 'Causa 9 de dano.';
-  if (id.includes('defend')) return 'Ganha 8 de Bloqueio.';
-  return `${current} (Aprimorada)`;
-}
+// These are no longer needed as they are handled in cards.ts
+// function upgradeDescription...
+// function upgradeEffects...
 
-function upgradeEffects(effects: Card['effects']): Card['effects'] {
-  return effects.map(e => {
-    if (e.damage) return { ...e, damage: Math.floor(e.damage * 1.5) };
-    if (e.block) return { ...e, block: Math.floor(e.block * 1.5) };
-    return e;
-  });
-}
 
 export function collectReward(state: GameState, card: Card | null): GameState {
   const player = { ...state.player };

@@ -1,187 +1,255 @@
-:root {
-  --card-width: 160px;
-  --card-height: 220px;
-  --color-attack: #7e1e1e;
-  --color-skill: #1e3a7e;
-  --color-power: #5e1e7e;
-  --color-mana: #00ccff;
-  --rarity-common: #666;
-  --rarity-uncommon: #1e7e34;
-  --rarity-rare: #7e5e1e;
-}
+/* ============================================================
+   Card Component — Shadow Realm Chronicles visual
+   ============================================================ */
 
 .card {
-  width: var(--card-width);
-  height: var(--card-height);
-  perspective: 1000px;
+  width: 210px;
+  height: 300px;
   cursor: pointer;
   user-select: none;
   flex-shrink: 0;
   position: relative;
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  font-family: var(--font-body);
 }
 
 .card.small {
-  transform: scale(0.7);
-  margin: -25px -15px;
+  transform: scale(0.65);
+  transform-origin: top left;
 }
 
+/* ---- Card shell (carbon texture + border) ---- */
 .card-inner {
   position: relative;
   width: 100%;
   height: 100%;
-  background: #2a2a2a;
-  border-radius: 12px;
-  border: 4px solid #444;
-  overflow: hidden;
+  border-radius: 8px;
+  border: 2px solid rgba(255,255,255,0.1);
+  overflow: visible;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-  transition: all 0.3s ease;
-  transform-style: preserve-3d;
+  box-shadow: var(--shadow-card);
+
+  /* Carbon fibre pattern */
+  background-color: var(--bg-slate);
+  background-image:
+    repeating-linear-gradient(45deg, rgba(0,0,0,0.2) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.2) 75%, rgba(0,0,0,0.2)),
+    repeating-linear-gradient(45deg, rgba(0,0,0,0.2) 25%, var(--bg-slate) 25%, var(--bg-slate) 75%, rgba(0,0,0,0.2) 75%, rgba(0,0,0,0.2));
+  background-position: 0 0, 4px 4px;
+  background-size: 8px 8px;
 }
 
-/* Card Rarity Borders */
-.card.rarity-uncommon .card-inner { border-color: #2ecc71; }
-.card.rarity-rare .card-inner { border-color: #f1c40f; box-shadow: 0 0 15px rgba(241, 196, 15, 0.3); }
-
-/* Card Type Backgrounds */
-.card.type-attack .card-inner { background: linear-gradient(135deg, #2a0a0a, #4a1a1a); }
-.card.type-skill .card-inner { background: linear-gradient(135deg, #0a0a2a, #1a1a4a); }
-.card.type-power .card-inner { background: linear-gradient(135deg, #1a0a2a, #3a1a4a); }
-
-/* Mana Crystal (Hearthstone style) */
+/* ---- Mana Crystal — top-left popout ---- */
 .card-mana-crystal {
   position: absolute;
-  top: -8px;
-  left: -8px;
-  width: 45px;
-  height: 45px;
-  background: radial-gradient(circle, #00d2ff, #0099cc);
-  border: 3px solid #fff;
-  border-radius: 50% 50% 50% 10%;
+  top: -16px;
+  left: -16px;
+  width: 40px;
+  height: 40px;
+  background: var(--crystal-gradient);
+  border: 2px solid #fff;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 20;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+  z-index: 50;
+  box-shadow: var(--shadow-glow-blue);
+  transition: transform 0.3s;
 }
 
 .mana-value {
   color: white;
-  font-size: 1.4rem;
+  font-family: var(--font-headline);
+  font-size: 1.3rem;
   font-weight: 900;
-  text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
 }
 
-/* Card Name Banner */
-.card-name-banner {
-  height: 30px;
-  background: rgba(0,0,0,0.6);
-  margin-top: 5px;
-  margin-left: 25px;
-  display: flex;
-  align-items: center;
-  padding-left: 15px;
-  border-left: 3px solid gold;
-  clip-path: polygon(0% 0%, 95% 0%, 100% 50%, 95% 100%, 0% 100%);
-}
-
-.card-name {
-  font-size: 0.85rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  color: #fff;
-  letter-spacing: 0.5px;
-}
-
-/* Art Box */
-.card-art-box {
-  height: 90px;
-  margin: 5px 10px;
-  background: #000;
-  border: 2px solid #555;
-  border-radius: 4px;
-  overflow: hidden;
+/* ---- Damage/Effect value badge — top-right ---- */
+.card-value-badge {
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  border: 2px solid #fff;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 50;
+  font-family: var(--font-headline);
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+}
+
+.card-value-badge.attack-badge {
+  background: var(--dragon-red);
+  box-shadow: var(--shadow-glow-red);
+}
+
+.card-value-badge.block-badge {
+  background: var(--mana-blue);
+  box-shadow: var(--shadow-glow-blue);
+}
+
+/* ---- Art box ---- */
+.card-art-box {
+  height: 150px;
+  margin: 6px 6px 0;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+  background: #05050a;
 }
 
 .card-art-image {
-  font-size: 3rem;
-  filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+  font-size: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  filter: drop-shadow(0 0 10px rgba(0,210,255,0.3));
 }
 
-/* Text Box */
+.card-art-overlay {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.card-art-overlay.attack  { background: rgba(154,3,30,0.25); }
+.card-art-overlay.skill   { background: rgba(0,210,255,0.15); }
+.card-art-overlay.power   { background: rgba(155,89,182,0.25); }
+
+/* ---- Name Banner (gold gradient) ---- */
+.card-name-banner {
+  height: 32px;
+  background: var(--gold-banner);
+  margin: -14px 16px 0;
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  border-radius: 2px;
+}
+
+.card-name {
+  font-family: var(--font-headline);
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #fff;
+  letter-spacing: 2px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 8px;
+}
+
+/* ---- Text Box ---- */
 .card-text-box {
   flex: 1;
-  background: rgba(255,255,255,0.05);
-  margin: 0 10px 5px 10px;
+  background: rgba(0,0,0,0.55);
+  margin: 6px 8px;
   border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 8px;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.04);
 }
 
 .card-description {
-  font-size: 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
   text-align: center;
-  line-height: 1.2;
-  color: #ddd;
-  font-style: italic;
+  line-height: 1.4;
+  color: #d0d0d0;
 }
 
-/* Footer */
+/* ---- Footer ---- */
 .card-footer {
-  height: 20px;
-  background: rgba(0,0,0,0.4);
+  height: 26px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 10px 4px;
 }
 
 .card-type-label {
+  font-family: var(--font-label);
   font-size: 0.6rem;
-  color: #aaa;
-  font-weight: bold;
+  color: rgba(201,168,76,0.6);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
+/* Type-colored label */
+.type-attack  .card-type-label { color: var(--dragon-red); }
+.type-skill   .card-type-label { color: var(--mana-blue); }
+.type-power   .card-type-label { color: var(--void-purple); }
+
+/* Rarity gem (bottom-right) */
+.rarity-gem {
+  width: 10px;
+  height: 10px;
+  transform: rotate(45deg);
+}
+
+.rarity-common   .rarity-gem { background: #888; }
+.rarity-uncommon .rarity-gem { background: var(--emerald-life); box-shadow: 0 0 6px rgba(46,204,113,0.5); }
+.rarity-rare     .rarity-gem { background: var(--void-purple); box-shadow: 0 0 8px rgba(155,89,182,0.8); }
+
 .upgrade-star {
-  color: #f1c40f;
+  color: var(--runic-gold);
   font-size: 1rem;
 }
 
-/* Hover Effects */
+/* ---- Hover / selected / disabled states ---- */
 .card:hover:not(.disabled) {
-  transform: translateY(-20px) rotateX(10deg) rotateY(5deg) scale(1.1);
-  z-index: 100;
+  z-index: 1000;
 }
 
 .card:hover:not(.disabled) .card-inner {
-  border-color: #00ccff;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 15px rgba(0, 204, 255, 0.4);
+  border-color: var(--mana-blue);
+  box-shadow: var(--shadow-card), var(--shadow-glow-blue);
 }
 
 .card.selected .card-inner {
-  border-color: #f1c40f;
-  box-shadow: 0 0 25px #f1c40f;
-  transform: translateY(-10px) scale(1.05);
+  border-color: var(--arcane-gold);
+  box-shadow: var(--shadow-card), var(--shadow-glow-gold);
 }
 
 .card.disabled {
-  filter: grayscale(1) brightness(0.5);
+  filter: grayscale(1) brightness(0.35);
   cursor: not-allowed;
 }
 
-/* Glossy Effect */
-.card-inner::after {
-  content: '';
+/* Rarity border tints */
+.card.rarity-uncommon .card-inner { border-color: rgba(46,204,113,0.4); }
+.card.rarity-rare     .card-inner { border-color: rgba(155,89,182,0.7); box-shadow: var(--shadow-card), var(--shadow-glow-purple); }
+
+/* Subtle shimmer on hover */
+.card-glow {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%);
+  inset: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.07) 50%, transparent 100%);
+  border-radius: 8px;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
 }
+
+.card:hover .card-glow { opacity: 1; }
+
+/* Legacy element kept for compatibility */
+.card-border-frame { display: none; }

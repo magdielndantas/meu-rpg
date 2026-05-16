@@ -3,87 +3,110 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  background: #1a1a1a;
-  color: white;
-  padding: 20px;
+  min-height: 100vh;
+  background: 
+    radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0d0d1a 100%),
+    url("https://www.transparenttextures.com/patterns/dark-matter.png");
+  color: #eee;
+  padding: 40px;
+  box-shadow: inset 0 0 150px rgba(0,0,0,0.9);
 }
 
 .rest-title {
-  font-size: 3rem;
-  margin-bottom: 50px;
-  color: #ff9900;
-  text-shadow: 0 0 20px rgba(255, 153, 0, 0.4);
+  font-family: var(--serif);
+  font-size: 3.5rem;
+  margin-bottom: 60px;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  text-shadow: 0 5px 20px rgba(0, 0, 0, 0.8), 0 0 20px rgba(241, 196, 15, 0.2);
 }
 
 .rest-options {
   display: flex;
-  gap: 30px;
+  gap: 40px;
 }
 
 .rest-option {
-  width: 250px;
-  height: 350px;
-  background: #2a2a2a;
-  border: 2px solid #444;
-  border-radius: 15px;
+  width: 300px;
+  height: 400px;
+  background: rgba(15, 15, 27, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
-  padding: 20px;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  padding: 30px;
   text-align: center;
+  backdrop-filter: blur(10px);
 }
 
 .rest-option:hover {
-  transform: translateY(-10px);
-  border-color: #ffcc00;
-  background: #333;
+  transform: translateY(-15px) scale(1.05);
+  border-color: var(--gold);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(241, 196, 15, 0.2);
+  background: rgba(22, 22, 40, 0.9);
 }
 
 .rest-option.disabled {
-  opacity: 0.5;
+  opacity: 0.3;
+  filter: grayscale(1);
   cursor: not-allowed;
 }
 
 .option-icon {
-  font-size: 4rem;
-  margin-bottom: 20px;
+  font-size: 5rem;
+  margin-bottom: 24px;
+  filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
 }
 
 .option-title {
-  font-size: 1.5rem;
+  font-family: var(--serif);
+  font-size: 1.8rem;
   font-weight: bold;
-  margin-bottom: 10px;
+  color: var(--gold);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .option-desc {
+  font-family: var(--sans);
   font-size: 1rem;
   color: #aaa;
+  line-height: 1.5;
 }
 
 .upgrade-selector {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.9);
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 15, 27, 0.95);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 50px;
-  z-index: 100;
+  padding: 60px;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
+.upgrade-selector h2 {
+  font-family: var(--serif);
+  color: var(--gold);
+  font-size: 2rem;
+  margin-bottom: 40px;
+  text-transform: uppercase;
 }
 
 .upgrade-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
   width: 100%;
-  max-width: 1000px;
+  max-width: 1200px;
   overflow-y: auto;
-  margin: 30px 0;
+  padding: 20px;
 }

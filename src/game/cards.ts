@@ -83,6 +83,25 @@ export const ALL_CARDS: Card[] = [
     description: 'Causa 5 de dano por cada ponto de Energia restante. Gasta toda a energia.',
     effects: [{ damage: 5, multiplier: 2 }],
   },
+  {
+    id: 'cleave',
+    name: 'Fender',
+    type: 'attack',
+    rarity: 'common',
+    cost: 1,
+    description: 'Causa 8 de dano a todos os inimigos.',
+    effects: [{ damage: 8 }],
+    isAoE: true,
+  },
+  {
+    id: 'body_slam',
+    name: 'Pancada Corporal',
+    type: 'attack',
+    rarity: 'uncommon',
+    cost: 1,
+    description: 'Causa dano igual ao seu Bloqueio atual.',
+    effects: [{ damage: 0, multiplier: 3 }], // Multiplier 3 for block-based damage
+  },
 
   // === SKILL CARDS ===
   {
@@ -93,6 +112,25 @@ export const ALL_CARDS: Card[] = [
     cost: 1,
     description: 'Ganha 5 de Bloqueio.',
     effects: [{ block: 5 }],
+  },
+  {
+    id: 'shrug_it_off',
+    name: 'Dar de Ombros',
+    type: 'skill',
+    rarity: 'common',
+    cost: 1,
+    description: 'Ganha 8 de Bloqueio. Compra 1 carta.',
+    effects: [{ block: 8 }, { draw: 1 }],
+  },
+  {
+    id: 'impervious',
+    name: 'Impenetrável',
+    type: 'skill',
+    rarity: 'rare',
+    cost: 2,
+    description: 'Ganha 30 de Bloqueio. Exaure.',
+    effects: [{ block: 30 }],
+    exhausts: true,
   },
   {
     id: 'iron_wave',
@@ -179,4 +217,62 @@ export function getRewardCards(count = 3): Card[] {
   const pool = ALL_CARDS.filter(c => c.rarity !== 'rare' || Math.random() < 0.3);
   const shuffled = [...pool].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count).map((c, i) => ({ ...c, id: `${c.id}_reward_${i}` }));
+}
+
+export function upgradeCard(card: Card): Card {
+  const upgraded: Card = {
+    ...card,
+    name: `${card.name}+`,
+    upgraded: true,
+  };
+
+  // Manual upgrades for specific cards or general rules
+  switch (card.id.split('_')[0]) {
+    case 'strike':
+      upgraded.description = 'Causa 9 de dano.';
+      upgraded.effects = [{ damage: 9 }];
+      break;
+    case 'defend':
+      upgraded.description = 'Ganha 8 de Bloqueio.';
+      upgraded.effects = [{ block: 8 }];
+      break;
+    case 'heavy_blow':
+      upgraded.description = 'Causa 20 de dano.';
+      upgraded.effects = [{ damage: 20 }];
+      break;
+    case 'burning_slash':
+      upgraded.description = 'Causa 10 de dano. Aplica 3 de Queimadura.';
+      upgraded.effects = [{ damage: 10 }, { applyStatus: { effect: 'burn', stacks: 3, target: 'enemy' } }];
+      break;
+    case 'poison_blade':
+      upgraded.description = 'Causa 7 de dano. Aplica 5 de Veneno.';
+      upgraded.effects = [{ damage: 7 }, { applyStatus: { effect: 'poison', stacks: 5, target: 'enemy' } }];
+      break;
+    case 'fortify':
+      upgraded.description = 'Ganha 16 de Bloqueio.';
+      upgraded.effects = [{ block: 16 }];
+      break;
+    case 'body_slam':
+      upgraded.cost = 0;
+      break;
+    case 'shrug_it_off':
+      upgraded.description = 'Ganha 11 de Bloqueio. Compra 1 carta.';
+      upgraded.effects = [{ block: 11 }, { draw: 1 }];
+      break;
+    case 'flex':
+      upgraded.description = 'Ganha 4 de Força. Perde 4 de Força no final do turno.';
+      upgraded.effects = [{ applyStatus: { effect: 'strength', stacks: 4, target: 'self' } }];
+      break;
+    default:
+      // General scaling for others
+      upgraded.effects = card.effects.map(e => ({
+        ...e,
+        damage: e.damage ? Math.floor(e.damage * 1.5) : undefined,
+        block: e.block ? Math.floor(e.block * 1.5) : undefined,
+        draw: e.draw ? e.draw + 1 : undefined,
+      }));
+      upgraded.description = `${card.description} (Aprimorada)`;
+  }
+
+  return upgraded;
 }
