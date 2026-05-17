@@ -27,14 +27,14 @@ interface FloatingText {
 function handRotate(idx: number, total: number): number {
   if (total <= 1) return 0;
   const half = (total - 1) / 2;
-  const spread = total <= 3 ? 7 : total <= 5 ? 6 : 4;
+  const spread = total <= 2 ? 10 : total <= 4 ? 8 : total <= 6 ? 6 : 4.5;
   return (idx - half) * spread;
 }
 function handOffsetY(idx: number, total: number): number {
   if (total <= 1) return 0;
   const half = (total - 1) / 2;
   const t = Math.abs((idx - half) / half);
-  return t * t * 26;
+  return t * t * 48;
 }
 
 const screenIn  = { opacity: 1, y: 0 };
@@ -53,6 +53,8 @@ export default function App() {
   const prevEnemiesRef = useRef(game.enemies);
   const prevPhaseRef = useRef(game.phase);
   const prevHandLengthRef = useRef(game.player.hand.length);
+  const playerFigureRef = useRef<HTMLDivElement>(null);
+  const enemyFigureRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const addFloatingText = useCallback((text: string, x: number, y: number, type: FloatingText['type']) => {
     const id = Math.random().toString(36).slice(2, 9);
@@ -64,17 +66,26 @@ export default function App() {
 
   // Floating text + damage sounds
   useEffect(() => {
+    const centerOf = (el: HTMLElement | null, yOffset = -60) => {
+      if (!el) return { x: window.innerWidth * 0.2, y: window.innerHeight * 0.4 };
+      const r = el.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height * 0.35 + yOffset };
+    };
+    const jitter = () => (Math.random() - 0.5) * 28;
+
     const p = game.player;
     const prevP = prevPlayerRef.current;
-    if (p.hp < prevP.hp) { addFloatingText(`-${prevP.hp - p.hp}`, 200, 400, 'damage'); play('playerHit'); }
-    if (p.hp > prevP.hp) { addFloatingText(`+${p.hp - prevP.hp}`, 200, 400, 'heal');   play('heal'); }
-    if (p.block > prevP.block) { addFloatingText(`+${p.block - prevP.block}`, 200, 350, 'block'); play('block'); }
+    const pc = centerOf(playerFigureRef.current);
+    if (p.hp < prevP.hp) { addFloatingText(`-${prevP.hp - p.hp}`, pc.x + jitter(), pc.y, 'damage'); play('playerHit'); }
+    if (p.hp > prevP.hp) { addFloatingText(`+${p.hp - prevP.hp}`, pc.x + jitter(), pc.y, 'heal');   play('heal'); }
+    if (p.block > prevP.block) { addFloatingText(`+${p.block - prevP.block}`, pc.x + jitter(), pc.y + 30, 'block'); play('block'); }
 
     game.enemies.forEach(e => {
       const prevE = prevEnemiesRef.current.find(pe => pe.id === e.id);
       if (prevE) {
-        if (e.hp < prevE.hp) { addFloatingText(`-${prevE.hp - e.hp}`, 800, 300, 'damage'); play('enemyHit'); }
-        if (e.block > prevE.block) { addFloatingText(`+${e.block - prevE.block}`, 800, 250, 'block'); play('block'); }
+        const ec = centerOf(enemyFigureRefs.current[e.id]);
+        if (e.hp < prevE.hp) { addFloatingText(`-${prevE.hp - e.hp}`, ec.x + jitter(), ec.y, 'damage'); play('enemyHit'); }
+        if (e.block > prevE.block) { addFloatingText(`+${e.block - prevE.block}`, ec.x + jitter(), ec.y + 30, 'block'); play('block'); }
       }
     });
 
@@ -269,10 +280,10 @@ export default function App() {
                 key={t.id}
                 className={`floating-text ${t.type}`}
                 style={{ left: t.x, top: t.y }}
-                initial={{ opacity: 1, y: 0, scale: 0.4, x: '-50%' }}
-                animate={{ opacity: [1, 1, 0], y: -130, scale: [1.5, 1.1, 0.9], x: '-50%' }}
+                initial={{ opacity: 1, y: 0, scale: 0.5, x: '-50%' }}
+                animate={{ opacity: [1, 1, 1, 0], y: -160, scale: [1.8, 1.2, 1.0, 0.85], x: '-50%' }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 1, times: [0, 0.15, 1], ease: 'easeOut' }}
+                transition={{ duration: 1.1, times: [0, 0.1, 0.6, 1], ease: 'easeOut' }}
               >
                 {t.text}
               </motion.div>
@@ -360,18 +371,19 @@ export default function App() {
 
           {/* Scene: hero left, enemies right */}
           <div className="battlefield-scene">
-            <div className="hero-zone">
+            <div className="hero-zone" ref={playerFigureRef}>
               <PlayerStats player={game.player} />
             </div>
             <div className="enemy-zone">
               {game.enemies.map((enemy, i) => (
-                <EnemyComponent
-                  key={enemy.id}
-                  enemy={enemy}
-                  selected={game.selectedCard !== null}
-                  onClick={() => handleEnemyClick(enemy.id)}
-                  entranceDelay={i * 0.12}
-                />
+                <div key={enemy.id} ref={el => { enemyFigureRefs.current[enemy.id] = el; }} style={{ display: 'contents' }}>
+                  <EnemyComponent
+                    enemy={enemy}
+                    selected={game.selectedCard !== null}
+                    onClick={() => handleEnemyClick(enemy.id)}
+                    entranceDelay={i * 0.12}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -406,8 +418,8 @@ export default function App() {
                   }}
                   exit={{ opacity: 0, y: 120, scale: 0.8, transition: { duration: 0.25 } }}
                   whileHover={game.phase === 'player_turn' ? {
-                    y: -78, rotate: 0, scale: 1.08, zIndex: 1000,
-                    transition: { type: 'spring', stiffness: 380, damping: 22 },
+                    y: -110, rotate: 0, scale: 1.12, zIndex: 1000,
+                    transition: { type: 'spring', stiffness: 420, damping: 20 },
                   } : {}}
                   transition={{ type: 'spring', stiffness: 260, damping: 24, delay: idx * 0.07 }}
                 >

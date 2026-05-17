@@ -5,18 +5,28 @@
   z-index: 4000;
 }
 
-/* Framer Motion animates entry/exit; these handle color + style */
 .floating-text {
   position: absolute;
   font-weight: 900;
-  font-size: 2.8rem;
-  text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+  font-size: 3.2rem;
+  text-shadow:
+    3px  3px 0 #000,
+   -3px -3px 0 #000,
+    3px -3px 0 #000,
+   -3px  3px 0 #000,
+    0    3px 0 #000,
+    0   -3px 0 #000,
+    3px  0   0 #000,
+   -3px  0   0 #000;
   white-space: nowrap;
   pointer-events: none;
   line-height: 1;
+  font-family: var(--font-headline);
+  letter-spacing: -1px;
+  /* centering via framer-motion x: '-50%' — do not add CSS transform here */
 }
 
-.floating-text.damage { color: #ff4757; }
-.floating-text.block  { color: #74b9ff; }
+.floating-text.damage { color: #ff3040; }
+.floating-text.block  { color: #48cae4; font-size: 2.4rem; }
 .floating-text.heal   { color: #2ecc71; }
-.floating-text.status { color: #f1c40f; font-size: 1.6rem; }
+.floating-text.status { color: #f1c40f; font-size: 1.8rem; }
