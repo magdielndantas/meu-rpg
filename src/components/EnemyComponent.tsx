@@ -22,13 +22,23 @@ const intentColors: Record<Enemy['intent'], string> = {
 
 function getSprite(name: string): string {
   const n = name.toLowerCase();
-  if (n.includes('cultista'))  return '🧙';
+  if (n.includes('cultista') || n.includes('iniciado')) return '🧙';
   if (n.includes('verme'))     return '🐛';
   if (n.includes('piolho'))    return '🦟';
   if (n.includes('gosma'))     return '🫧';
   if (n.includes('guardião'))  return '👹';
   if (n.includes('archer'))    return '🏹';
-  if (n.includes('wraith') || n.includes('shadow')) return '👻';
+  if (n.includes('espectro') || n.includes('sombri') || n.includes('wraith')) return '👻';
+  if (n.includes('cavaleiro') || n.includes('sentinela')) return '⚔️';
+  if (n.includes('golem') || n.includes('construto') || n.includes('esférico')) return '🤖';
+  if (n.includes('bruxa') || n.includes('mago'))    return '🔮';
+  if (n.includes('gremlin'))   return '👺';
+  if (n.includes('hidra'))     return '🐉';
+  if (n.includes('esqueleto') || n.includes('livro')) return '💀';
+  if (n.includes('morcego'))   return '🦇';
+  if (n.includes('fungo') || n.includes('lesma'))   return '🍄';
+  if (n.includes('desperto'))  return '😈';
+  if (n.includes('nobre'))     return '👑';
   return '👾';
 }
 
@@ -117,11 +127,13 @@ export default function EnemyComponent({ enemy, selected, onClick, entranceDelay
       {/* Status effects */}
       {Object.values(enemy.status).some(v => v > 0) && (
         <div className="enemy-statuses">
-          {enemy.status.burn       > 0 && <span className="status burn">🔥{enemy.status.burn}</span>}
-          {enemy.status.poison     > 0 && <span className="status poison">☠️{enemy.status.poison}</span>}
-          {enemy.status.weak       > 0 && <span className="status weak">💧{enemy.status.weak}</span>}
-          {enemy.status.vulnerable > 0 && <span className="status vuln">🎯{enemy.status.vulnerable}</span>}
-          {enemy.status.strength   > 0 && <span className="status str">💪{enemy.status.strength}</span>}
+          {enemy.status.burn        > 0 && <span className="status burn">🔥{enemy.status.burn}</span>}
+          {enemy.status.poison      > 0 && <span className="status poison">☠️{enemy.status.poison}</span>}
+          {enemy.status.bleed       > 0 && <span className="status bleed">🩸{enemy.status.bleed}</span>}
+          {enemy.status.weak        > 0 && <span className="status weak">💧{enemy.status.weak}</span>}
+          {enemy.status.vulnerable  > 0 && <span className="status vuln">🎯{enemy.status.vulnerable}</span>}
+          {enemy.status.strength    > 0 && <span className="status str">💪{enemy.status.strength}</span>}
+          {enemy.status.regenerate  > 0 && <span className="status regen">💚{enemy.status.regenerate}</span>}
         </div>
       )}
     </motion.div>

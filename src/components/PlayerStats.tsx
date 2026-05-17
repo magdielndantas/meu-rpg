@@ -51,11 +51,13 @@ export default function PlayerStats({ player }: Props) {
       {/* Status effects */}
       {Object.values(player.status).some(v => v > 0) && (
         <div className="hero-statuses">
-          {player.status.burn       > 0 && <span className="status burn">🔥{player.status.burn}</span>}
-          {player.status.poison     > 0 && <span className="status poison">☠️{player.status.poison}</span>}
-          {player.status.weak       > 0 && <span className="status weak">💧{player.status.weak}</span>}
-          {player.status.vulnerable > 0 && <span className="status vuln">🎯{player.status.vulnerable}</span>}
-          {player.status.strength   > 0 && <span className="status str">💪{player.status.strength}</span>}
+          {player.status.burn        > 0 && <span className="status burn">🔥{player.status.burn}</span>}
+          {player.status.poison      > 0 && <span className="status poison">☠️{player.status.poison}</span>}
+          {player.status.bleed       > 0 && <span className="status bleed">🩸{player.status.bleed}</span>}
+          {player.status.weak        > 0 && <span className="status weak">💧{player.status.weak}</span>}
+          {player.status.vulnerable  > 0 && <span className="status vuln">🎯{player.status.vulnerable}</span>}
+          {player.status.strength    > 0 && <span className="status str">💪{player.status.strength}</span>}
+          {player.status.regenerate  > 0 && <span className="status regen">💚{player.status.regenerate}</span>}
         </div>
       )}
     </div>

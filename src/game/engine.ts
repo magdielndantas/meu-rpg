@@ -60,7 +60,7 @@ export function createInitialState(): GameState {
     hp: 80,
     maxHp: 80,
     block: 0,
-    status: { burn: 0, poison: 0, weak: 0, vulnerable: 0, strength: 0 },
+    status: { burn: 0, poison: 0, weak: 0, vulnerable: 0, strength: 0, bleed: 0, regenerate: 0 },
     energy: 3,
     maxEnergy: 3,
     deck,
@@ -107,6 +107,14 @@ function startPlayerTurn(state: GameState): GameState {
     block: 0,
     energy: state.player.maxEnergy,
   };
+
+  // Regenerate heals at start of player turn
+  if (player.status.regenerate > 0) {
+    const healed = Math.min(player.maxHp - player.hp, player.status.regenerate);
+    player.hp += healed;
+    state = log(state, `Regeneração curou ${healed} de HP`, 'heal');
+  }
+
   player = drawCards(player, 5);
 
   // Advance enemy intents
@@ -172,6 +180,13 @@ export function playCard(state: GameState, cardId: string, targetId: string): Ga
     if (effect.energy) {
       player.energy += effect.energy;
       s = log(s, `Ganhou ${effect.energy} de Energia`, 'system');
+    }
+
+    // Heal
+    if (effect.heal) {
+      const healed = Math.min(player.maxHp - player.hp, effect.heal);
+      player.hp += healed;
+      s = log(s, `Recuperou ${healed} de HP`, 'heal');
     }
 
     // Damage
@@ -260,15 +275,26 @@ export function endTurn(state: GameState): GameState {
   let s = state;
   const player = { ...s.player };
 
-  // Discard hand
-  player.discardPile = [...player.discardPile, ...player.hand];
-  player.hand = [];
+  // Discard hand — retain cards stay, ethereal cards exhaust
+  const retainCards = player.hand.filter(c => c.retain);
+  const playedOut = player.hand.filter(c => !c.retain);
+  const etherealCards = playedOut.filter(c => c.ethereal);
+  const normalCards = playedOut.filter(c => !c.ethereal);
+  player.discardPile = [...player.discardPile, ...normalCards];
+  player.exhaustPile = [...player.exhaustPile, ...etherealCards];
+  player.hand = retainCards;
+  if (etherealCards.length > 0) s = log(s, `${etherealCards.length} carta(s) etérea(s) exauriram`, 'system');
 
   // Tick player statuses
   if (player.status.burn > 0) {
     player.hp -= player.status.burn;
     s = log(s, `Você recebeu ${player.status.burn} de dano de Queimadura`, 'damage');
     player.status = { ...player.status, burn: Math.max(0, player.status.burn - 1) };
+  }
+  if (player.status.bleed > 0) {
+    player.hp -= player.status.bleed;
+    s = log(s, `Você recebeu ${player.status.bleed} de dano de Sangramento`, 'damage');
+    player.status = { ...player.status, bleed: Math.max(0, player.status.bleed - 1) };
   }
   if (player.status.weak > 0) {
     player.status = { ...player.status, weak: player.status.weak - 1 };
@@ -328,6 +354,18 @@ function runEnemyTurn(state: GameState): GameState {
       enemies[i] = { ...enemies[i], hp: enemies[i].hp - enemies[i].status.burn };
       s = log(s, `${enemies[i].name} recebeu ${enemies[i].status.burn} de dano de Queimadura`, 'damage');
       enemies[i] = { ...enemies[i], status: { ...enemies[i].status, burn: Math.max(0, enemies[i].status.burn - 1) } };
+    }
+    if (enemies[i].status.bleed > 0) {
+      enemies[i] = { ...enemies[i], hp: enemies[i].hp - enemies[i].status.bleed };
+      s = log(s, `${enemies[i].name} recebeu ${enemies[i].status.bleed} de dano de Sangramento`, 'damage');
+      enemies[i] = { ...enemies[i], status: { ...enemies[i].status, bleed: Math.max(0, enemies[i].status.bleed - 1) } };
+    }
+    if (enemies[i].status.regenerate > 0) {
+      const healed = Math.min(enemies[i].maxHp - enemies[i].hp, enemies[i].status.regenerate);
+      if (healed > 0) {
+        enemies[i] = { ...enemies[i], hp: enemies[i].hp + healed };
+        s = log(s, `${enemies[i].name} regenerou ${healed} de HP`, 'heal');
+      }
     }
     if (enemies[i].status.weak > 0) {
       enemies[i] = { ...enemies[i], status: { ...enemies[i].status, weak: enemies[i].status.weak - 1 } };
@@ -543,6 +581,8 @@ function statusLabel(effect: StatusEffect): string {
     vulnerable: 'Vulnerável',
     strength: 'Força',
     block: 'Bloqueio',
+    bleed: 'Sangramento',
+    regenerate: 'Regeneração',
   };
   return labels[effect] ?? effect;
 }

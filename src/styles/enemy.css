@@ -149,9 +149,11 @@
 }
 .status.burn   { border-color: rgba(230,57,70,0.5);  color: var(--dragon-red); }
 .status.poison { border-color: rgba(46,204,113,0.5); color: var(--emerald-life); }
+.status.bleed  { border-color: rgba(180,0,50,0.6);   color: #e05070; }
 .status.weak   { border-color: rgba(0,210,255,0.5);  color: var(--mana-blue); }
 .status.vuln   { border-color: rgba(154,3,30,0.5);   color: var(--crimson-blood); }
 .status.str    { border-color: rgba(201,168,76,0.5); color: var(--arcane-gold); }
+.status.regen  { border-color: rgba(46,180,100,0.6); color: #50e090; }
 
 /* Hit flash */
 .hit-flash {

@@ -1,14 +1,15 @@
 export type CardType = 'attack' | 'skill' | 'power';
 export type CardRarity = 'common' | 'uncommon' | 'rare';
-export type StatusEffect = 'burn' | 'poison' | 'weak' | 'vulnerable' | 'strength' | 'block';
+export type StatusEffect = 'burn' | 'poison' | 'weak' | 'vulnerable' | 'strength' | 'block' | 'bleed' | 'regenerate';
 
 export interface CardEffect {
   damage?: number;
   block?: number;
   draw?: number;
   energy?: number;
+  heal?: number;
   applyStatus?: { effect: StatusEffect; stacks: number; target: 'enemy' | 'self' };
-  multiplier?: number; // multiplies damage by stacks of a status
+  multiplier?: number;
 }
 
 export interface Card {
@@ -22,6 +23,8 @@ export interface Card {
   upgraded?: boolean;
   exhausts?: boolean;
   isAoE?: boolean;
+  retain?: boolean;
+  ethereal?: boolean;
 }
 
 export interface StatusState {
@@ -30,6 +33,8 @@ export interface StatusState {
   weak: number;
   vulnerable: number;
   strength: number;
+  bleed: number;
+  regenerate: number;
 }
 
 export type RelicTrigger = 'onCombatStart' | 'onTurnStart' | 'onTurnEnd' | 'onCardPlayed';
