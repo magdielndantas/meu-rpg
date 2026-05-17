@@ -42,11 +42,20 @@ function getSprite(name: string): string {
   return '👾';
 }
 
+function getStatusAura(status: Enemy['status']): string {
+  if (status.burn > 0)   return 'aura-burn';
+  if (status.bleed > 0)  return 'aura-bleed';
+  if (status.poison > 0) return 'aura-poison';
+  if (status.regenerate > 0) return 'aura-regen';
+  return '';
+}
+
 export default function EnemyComponent({ enemy, selected, onClick, entranceDelay = 0 }: Props) {
   const hpPercent = Math.max(0, (enemy.hp / enemy.maxHp) * 100);
   const controls = useAnimation();
   const prevHp = useRef(enemy.hp);
   const [flashing, setFlashing] = useState(false);
+  const auraClass = getStatusAura(enemy.status);
 
   useEffect(() => {
     if (enemy.hp < prevHp.current) {
@@ -109,7 +118,7 @@ export default function EnemyComponent({ enemy, selected, onClick, entranceDelay
       )}
 
       {/* Big sprite */}
-      <div className="enemy-sprite-wrap">
+      <div className={`enemy-sprite-wrap ${auraClass}`}>
         <div className="enemy-sprite">{getSprite(enemy.name)}</div>
         {flashing && (
           <motion.div

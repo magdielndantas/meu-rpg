@@ -51,7 +51,27 @@
 .hero-hp-fill {
   height: 100%;
   background: var(--hp-gradient);
-  box-shadow: 0 0 8px rgba(154,3,30,0.4);
+  box-shadow: 0 0 10px rgba(230,57,70,0.45);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Moving shine across HP bar */
+.hero-hp-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.18), transparent);
+  transform: skewX(-20deg);
+  animation: hp-shine 3s ease-in-out infinite;
+}
+
+@keyframes hp-shine {
+  0%   { left: -60%; }
+  40%, 100% { left: 160%; }
 }
 
 .hero-hp-text {

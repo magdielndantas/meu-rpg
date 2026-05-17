@@ -103,28 +103,47 @@
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
-  background: #05050a;
 }
 
 .card-art-image {
-  font-size: 4rem;
+  font-size: 4.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
-  filter: drop-shadow(0 0 10px rgba(0,210,255,0.3));
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 0 14px rgba(255,255,255,0.15)) drop-shadow(0 4px 12px rgba(0,0,0,0.7));
+  transition: transform 0.3s ease, filter 0.3s ease;
 }
 
-.card-art-overlay {
+.card:hover .card-art-image {
+  transform: scale(1.12) translateY(-4px);
+  filter: drop-shadow(0 0 22px rgba(255,255,255,0.25)) drop-shadow(0 4px 18px rgba(0,0,0,0.8));
+}
+
+/* Radial glow behind the art icon */
+.card-art-glow {
   position: absolute;
   inset: 0;
-  mix-blend-mode: overlay;
+  background: radial-gradient(ellipse 70% 60% at 50% 60%, rgba(255,255,255,0.06) 0%, transparent 70%);
   pointer-events: none;
+  z-index: 1;
 }
 
-.card-art-overlay.attack  { background: rgba(154,3,30,0.25); }
-.card-art-overlay.skill   { background: rgba(0,210,255,0.15); }
-.card-art-overlay.power   { background: rgba(155,89,182,0.25); }
+/* Shimmer lines across art on hover */
+.card-art-box::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -55deg,
+    transparent 0px, transparent 8px,
+    rgba(255,255,255,0.018) 8px, rgba(255,255,255,0.018) 9px
+  );
+  pointer-events: none;
+  z-index: 3;
+}
 
 /* ---- Name Banner (gold gradient) ---- */
 .card-name-banner {
@@ -181,7 +200,21 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 10px 4px;
+  padding: 0 8px 4px;
+}
+
+/* Card badges: retain, ethereal, exhaust */
+.card-badges {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.card-badge {
+  font-size: 0.58rem;
+  opacity: 0.75;
+  cursor: help;
+  line-height: 1;
 }
 
 .card-type-label {

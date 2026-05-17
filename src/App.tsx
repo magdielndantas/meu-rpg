@@ -333,6 +333,23 @@ export default function App() {
         {/* BATTLEFIELD */}
         <div className="battlefield">
 
+          {/* Atmospheric particles */}
+          <div className="battle-ambience" aria-hidden="true">
+            {[
+              { left: '8%',  delay: 0,   dur: 6.2 },
+              { left: '18%', delay: 1.4, dur: 5.1 },
+              { left: '30%', delay: 0.6, dur: 7.4 },
+              { left: '42%', delay: 2.8, dur: 5.8 },
+              { left: '56%', delay: 1.0, dur: 6.8 },
+              { left: '68%', delay: 3.5, dur: 4.9 },
+              { left: '78%', delay: 0.3, dur: 7.1 },
+              { left: '88%', delay: 2.2, dur: 5.5 },
+            ].map((p, i) => (
+              <div key={i} className="ember" style={{ left: p.left, animationDelay: `${p.delay}s`, animationDuration: `${p.dur}s` }} />
+            ))}
+            <div className="battlefield-fog" />
+          </div>
+
           {/* Top info bar: pile counts + compact log */}
           <div className="battlefield-info">
             <span style={{ fontSize:'0.65rem', letterSpacing:'2px', textTransform:'uppercase', color:'rgba(201,168,76,0.4)', fontFamily:'var(--font-label)' }}>
