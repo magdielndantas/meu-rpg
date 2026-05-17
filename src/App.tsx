@@ -49,6 +49,8 @@ export default function App() {
   const [playedCard, setPlayedCard] = useState<Card | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [turnBanner, setTurnBanner] = useState<'player' | 'enemy' | null>(null);
+  const [dragTarget, setDragTarget] = useState<'attack' | 'self' | null>(null);
+  const [hiddenCardId, setHiddenCardId] = useState<string | null>(null);
 
   const prevPlayerRef = useRef(game.player);
   const prevEnemiesRef = useRef(game.enemies);
@@ -160,6 +162,53 @@ export default function App() {
     setTimeout(() => {
       setGame(g => playCard(g, g.selectedCard!, enemyId));
       setPlayedCard(null);
+    }, 560);
+  }, [game, playedCard]);
+
+  const handleCardDragEnd = useCallback((
+    cardId: string,
+    point: { x: number; y: number },
+    offset: { x: number; y: number },
+  ) => {
+    setDragTarget(null);
+    if (game.phase !== 'player_turn' || playedCard) return;
+    if (Math.abs(offset.x) < 8 && Math.abs(offset.y) < 8) return; // was a click
+
+    const card = game.player.hand.find(c => c.id === cardId);
+    if (!card || card.cost > game.player.energy) return;
+
+    const needsEnemy = !card.isAoE && card.effects.some(e =>
+      e.damage != null || e.applyStatus?.target === 'enemy',
+    );
+
+    let targetId = '';
+
+    if (needsEnemy) {
+      for (const enemy of game.enemies) {
+        const el = enemyFigureRefs.current[enemy.id];
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        if (point.x >= rect.left - 36 && point.x <= rect.right + 36 &&
+            point.y >= rect.top  - 36 && point.y <= rect.bottom + 36) {
+          targetId = enemy.id;
+          break;
+        }
+      }
+      if (!targetId) { setGame(g => ({ ...g, selectedCard: null })); return; }
+    } else {
+      // AoE / self: play if dragged above the hand area
+      if (point.y > window.innerHeight - 340) {
+        setGame(g => ({ ...g, selectedCard: null })); return;
+      }
+    }
+
+    play(card.type === 'attack' ? 'cardAttack' : card.type === 'power' ? 'cardPower' : 'cardSkill');
+    setPlayedCard(card);
+    setHiddenCardId(cardId);
+    setTimeout(() => {
+      setGame(g => playCard(g, cardId, targetId));
+      setPlayedCard(null);
+      setHiddenCardId(null);
     }, 560);
   }, [game, playedCard]);
 
@@ -350,7 +399,7 @@ export default function App() {
         </header>
 
         {/* BATTLEFIELD */}
-        <div className="battlefield">
+        <div className={`battlefield${dragTarget === 'attack' ? ' dragging-attack' : dragTarget === 'self' ? ' dragging-self' : ''}`}>
 
           {/* Atmospheric particles */}
           <div className="battle-ambience" aria-hidden="true">
@@ -444,7 +493,24 @@ export default function App() {
                 <motion.div
                   key={card.id}
                   className="card-wrapper"
-                  style={{ transformOrigin: 'bottom center', zIndex: idx + 10 }}
+                  style={{
+                    transformOrigin: 'bottom center',
+                    zIndex: idx + 10,
+                    visibility: hiddenCardId === card.id ? 'hidden' : 'visible',
+                  }}
+                  drag={game.phase === 'player_turn' && !playedCard && card.cost <= game.player.energy}
+                  dragSnapToOrigin
+                  dragElastic={0.1}
+                  dragMomentum={false}
+                  dragTransition={{ bounceStiffness: 700, bounceDamping: 38 }}
+                  onDragStart={() => {
+                    const isAttack = !card.isAoE && card.effects.some(e =>
+                      e.damage != null || e.applyStatus?.target === 'enemy',
+                    );
+                    setDragTarget(isAttack ? 'attack' : 'self');
+                    setGame(g => ({ ...g, selectedCard: card.id }));
+                  }}
+                  onDragEnd={(_, info) => handleCardDragEnd(card.id, info.point, info.offset)}
                   initial={{ opacity: 0, y: 140, rotate: 0 }}
                   animate={{
                     opacity: 1,
@@ -452,7 +518,7 @@ export default function App() {
                     rotate: handRotate(idx, game.player.hand.length),
                   }}
                   exit={{ opacity: 0, y: 120, scale: 0.8, transition: { duration: 0.25 } }}
-                  whileHover={game.phase === 'player_turn' ? {
+                  whileHover={game.phase === 'player_turn' && !dragTarget ? {
                     y: -110, rotate: 0, scale: 1.12, zIndex: 1000,
                     transition: { type: 'spring', stiffness: 420, damping: 20 },
                   } : {}}

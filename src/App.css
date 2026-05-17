@@ -149,11 +149,9 @@
 }
 
 /* Open scene where characters stand */
+/* Open scene — Pokemon-style perspective layout */
 .battlefield-scene {
   flex: 1;
-  display: flex;
-  align-items: flex-end;
-  padding: 16px 80px 52px 60px;
   position: relative;
   overflow: hidden;
   z-index: 5;
@@ -303,19 +301,51 @@
   100% { opacity: 1.0;  transform: translateX(-50%) scale(1.18); }
 }
 
+/* Hero: bottom-left, close to camera */
 .hero-zone {
-  width: 220px;
-  flex-shrink: 0;
+  position: absolute;
+  bottom: 28px;
+  left: 6%;
+  width: 200px;
   display: flex;
   justify-content: center;
+  z-index: 10;
 }
 
+/* Enemies: upper area, slightly smaller (feels farther away) */
 .enemy-zone {
-  flex: 1;
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
   display: flex;
-  align-items: flex-end;
   justify-content: center;
+  align-items: flex-start;
   gap: 52px;
+  z-index: 8;
+  transform: scale(0.82);
+  transform-origin: top center;
+}
+
+/* ── DRAG TARGET INDICATORS ─────────────────────────────────── */
+/* Attack card dragged: enemies pulse red */
+.dragging-attack .enemy-figure {
+  animation: drag-target-enemy 0.8s ease-in-out infinite !important;
+  cursor: crosshair !important;
+}
+@keyframes drag-target-enemy {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(230,57,70,0.4)) drop-shadow(0 8px 24px rgba(0,0,0,0.9)); }
+  50%       { filter: drop-shadow(0 0 24px rgba(230,57,70,1)) drop-shadow(0 0 10px rgba(255,60,0,0.6)) drop-shadow(0 8px 24px rgba(0,0,0,0.9)); }
+}
+
+/* Self/AoE card dragged: hero pulses blue */
+.dragging-self .hero-figure {
+  animation: drag-target-self 0.8s ease-in-out infinite !important;
+  cursor: crosshair !important;
+}
+@keyframes drag-target-self {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(0,210,255,0.3)); }
+  50%       { filter: drop-shadow(0 0 24px rgba(0,210,255,1)) drop-shadow(0 0 10px rgba(100,200,255,0.5)); }
 }
 
 /* ── HAND AREA ─────────────────────────────────────────────── */
