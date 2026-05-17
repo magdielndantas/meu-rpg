@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import type { Player } from '../types';
+import { HERO_SPRITE, SPRITE_SIZE } from '../game/sprites';
 import '../styles/player.css';
 
 interface Props { player: Player; }
@@ -27,7 +28,15 @@ export default function PlayerStats({ player }: Props) {
         animate={{ y: [0, -6, 0] }}
         transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
       >
-        🧙
+        {HERO_SPRITE ? (
+          <img
+            src={HERO_SPRITE}
+            alt={player.name}
+            width={SPRITE_SIZE}
+            height={SPRITE_SIZE}
+            style={{ imageRendering: 'pixelated', display: 'block' }}
+          />
+        ) : '🧙'}
       </motion.div>
 
       {/* Shadow under sprite */}

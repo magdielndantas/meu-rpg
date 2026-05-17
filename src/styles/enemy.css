@@ -104,6 +104,12 @@
   top: 45%;
 }
 
+/* Sprite size variants */
+.enemy-sprite-img {
+  display: block;
+  object-fit: contain;
+}
+
 /* Sprite */
 .enemy-sprite-wrap {
   position: relative;

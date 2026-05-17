@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import type { Enemy } from '../types';
+import { ENEMY_SPRITES, SPRITE_SIZE } from '../game/sprites';
 import '../styles/enemy.css';
 
 interface Props {
@@ -119,7 +120,18 @@ export default function EnemyComponent({ enemy, selected, onClick, entranceDelay
 
       {/* Big sprite */}
       <div className={`enemy-sprite-wrap ${auraClass}`}>
-        <div className="enemy-sprite">{getSprite(enemy.name)}</div>
+        {ENEMY_SPRITES[enemy.name] ? (
+          <img
+            src={ENEMY_SPRITES[enemy.name]}
+            alt={enemy.name}
+            className="enemy-sprite enemy-sprite-img"
+            width={SPRITE_SIZE}
+            height={SPRITE_SIZE}
+            style={{ imageRendering: 'pixelated' }}
+          />
+        ) : (
+          <div className="enemy-sprite enemy-sprite-emoji">{getSprite(enemy.name)}</div>
+        )}
         {flashing && (
           <motion.div
             className="hit-flash"

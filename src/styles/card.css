@@ -106,21 +106,41 @@
 }
 
 .card-art-image {
-  font-size: 4.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
   position: relative;
   z-index: 2;
-  filter: drop-shadow(0 0 14px rgba(255,255,255,0.15)) drop-shadow(0 4px 12px rgba(0,0,0,0.7));
   transition: transform 0.3s ease, filter 0.3s ease;
 }
 
-.card:hover .card-art-image {
-  transform: scale(1.12) translateY(-4px);
-  filter: drop-shadow(0 0 22px rgba(255,255,255,0.25)) drop-shadow(0 4px 18px rgba(0,0,0,0.8));
+/* rpg-awesome icon inside art box */
+.card-art-image .ra {
+  font-size: 4.2rem;
+  color: rgba(255,255,255,0.88);
+  text-shadow:
+    0 0 20px rgba(255,255,255,0.2),
+    0 4px 14px rgba(0,0,0,0.8);
+  line-height: 1;
+  transition: text-shadow 0.3s ease, transform 0.3s ease;
 }
+
+.card:hover .card-art-image {
+  transform: scale(1.1) translateY(-5px);
+}
+
+.card:hover .card-art-image .ra {
+  text-shadow:
+    0 0 30px rgba(255,255,255,0.35),
+    0 0 60px rgba(255,255,255,0.1),
+    0 4px 20px rgba(0,0,0,0.9);
+}
+
+/* Type-tinted icon colors */
+.type-attack  .card-art-image .ra { color: rgba(255,160,100,0.92); }
+.type-skill   .card-art-image .ra { color: rgba(100,200,255,0.92); }
+.type-power   .card-art-image .ra { color: rgba(200,140,255,0.92); }
 
 /* Radial glow behind the art icon */
 .card-art-glow {
