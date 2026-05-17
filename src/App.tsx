@@ -330,54 +330,50 @@ export default function App() {
           </div>
         </header>
 
-        {/* BATTLEFIELD GRID */}
+        {/* BATTLEFIELD */}
         <div className="battlefield">
-          <aside className="player-side">
-            <PlayerStats player={game.player} />
-            <div className="pile-info">
-              <div style={{ fontSize: '0.6rem', letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(201,168,76,0.5)', fontFamily: 'var(--font-label)', textAlign: 'center' }}>
-                Gerenciamento de Cartas
-              </div>
-              <span title="Pilha de Compra" style={{ cursor: 'help' }}>
-                <span style={{ fontSize: '1rem' }}>📚</span>
-                <span style={{ flex: 1 }}>Compra</span>
-                <strong style={{ color: '#fff', fontFamily: 'var(--font-headline)', fontSize: '1.1rem' }}>{game.player.drawPile.length}</strong>
-              </span>
-              <span title="Pilha de Descarte" style={{ cursor: 'help' }}>
-                <span style={{ fontSize: '1rem' }}>🗑️</span>
-                <span style={{ flex: 1 }}>Descarte</span>
-                <strong style={{ color: '#fff', fontFamily: 'var(--font-headline)', fontSize: '1.1rem' }}>{game.player.discardPile.length}</strong>
-              </span>
-              <span title="Pilha de Exausto" style={{ cursor: 'help' }}>
-                <span style={{ fontSize: '1rem' }}>💨</span>
-                <span style={{ flex: 1 }}>Exausto</span>
-                <strong style={{ color: '#fff', fontFamily: 'var(--font-headline)', fontSize: '1.1rem' }}>{game.player.exhaustPile.length}</strong>
-              </span>
-              <button className="deck-btn" onClick={() => setShowDeck(v => !v)}>
-                Deck ({game.player.deck.length})
-              </button>
-            </div>
-          </aside>
 
-          <div className="center-panel">
-            <CombatLog entries={game.log} />
+          {/* Top info bar: pile counts + compact log */}
+          <div className="battlefield-info">
+            <span style={{ fontSize:'0.65rem', letterSpacing:'2px', textTransform:'uppercase', color:'rgba(201,168,76,0.4)', fontFamily:'var(--font-label)' }}>
+              📚 {game.player.drawPile.length} &nbsp; 🗑️ {game.player.discardPile.length} &nbsp; 💨 {game.player.exhaustPile.length}
+            </span>
+            <CombatLog entries={game.log} compact />
           </div>
 
-          <div className="enemy-side">
-            {game.enemies.map((enemy, i) => (
-              <EnemyComponent
-                key={enemy.id}
-                enemy={enemy}
-                selected={game.selectedCard !== null}
-                onClick={() => handleEnemyClick(enemy.id)}
-                entranceDelay={i * 0.12}
-              />
-            ))}
+          {/* Scene: hero left, enemies right */}
+          <div className="battlefield-scene">
+            <div className="hero-zone">
+              <PlayerStats player={game.player} />
+            </div>
+            <div className="enemy-zone">
+              {game.enemies.map((enemy, i) => (
+                <EnemyComponent
+                  key={enemy.id}
+                  enemy={enemy}
+                  selected={game.selectedCard !== null}
+                  onClick={() => handleEnemyClick(enemy.id)}
+                  entranceDelay={i * 0.12}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
         {/* HAND AREA */}
         <div className="hand-area">
+          {/* Energy */}
+          <div className="hand-energy">
+            <span className="hand-energy-label">Mana</span>
+            <div className="hand-energy-orbs">
+              {Array.from({ length: game.player.maxEnergy }).map((_, i) => (
+                <div key={i} className={`energy-orb ${i < game.player.energy ? 'full' : ''}`} />
+              ))}
+            </div>
+            <span className="hand-energy-count">{game.player.energy}/{game.player.maxEnergy}</span>
+          </div>
+
+          {/* Cards */}
           <div className="hand">
             <AnimatePresence>
               {game.player.hand.map((card, idx) => (
@@ -393,10 +389,7 @@ export default function App() {
                   }}
                   exit={{ opacity: 0, y: 120, scale: 0.8, transition: { duration: 0.25 } }}
                   whileHover={game.phase === 'player_turn' ? {
-                    y: -78,
-                    rotate: 0,
-                    scale: 1.08,
-                    zIndex: 1000,
+                    y: -78, rotate: 0, scale: 1.08, zIndex: 1000,
                     transition: { type: 'spring', stiffness: 380, damping: 22 },
                   } : {}}
                   transition={{ type: 'spring', stiffness: 260, damping: 24, delay: idx * 0.07 }}
@@ -411,15 +404,20 @@ export default function App() {
               ))}
             </AnimatePresence>
             {game.player.hand.length === 0 && game.phase === 'player_turn' && (
-              <motion.div
-                className="empty-hand"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-              >
+              <motion.div className="empty-hand" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
                 Mão vazia — encerre o turno
               </motion.div>
             )}
+          </div>
+
+          {/* Pile info */}
+          <div className="hand-piles">
+            <div className="pile-count"><span>📚</span><span>Compra</span><strong>{game.player.drawPile.length}</strong></div>
+            <div className="pile-count"><span>🗑️</span><span>Descarte</span><strong>{game.player.discardPile.length}</strong></div>
+            <div className="pile-count"><span>💨</span><span>Exausto</span><strong>{game.player.exhaustPile.length}</strong></div>
+            <button className="deck-btn" onClick={() => setShowDeck(v => !v)}>
+              Deck ({game.player.deck.length})
+            </button>
           </div>
         </div>
 

@@ -1,57 +1,72 @@
 /* ============================================================
-   Enemy Component — Shadow Realm Chronicles visual
+   Enemy Figure — Slay the Spire style (no card frame)
    ============================================================ */
 
-.enemy-container {
-  position: relative;
+.enemy-figure {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
-  transition: transform 0.2s;
   user-select: none;
+  position: relative;
 }
 
-.enemy-container:hover {
-  transform: scale(1.04);
+/* Targeting glow */
+.enemy-figure.targeted .enemy-sprite {
+  filter: drop-shadow(0 0 20px rgba(201,168,76,0.7)) drop-shadow(0 8px 24px rgba(0,0,0,0.9));
 }
 
-.enemy-container.targeted .enemy-card {
-  border-color: var(--arcane-gold) !important;
-  box-shadow: 0 0 20px rgba(201,168,76,0.5) !important;
+/* Intent bubble */
+.enemy-intent {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(10,10,20,0.85);
+  border: 1px solid;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
 }
 
-/* ---- Name + HP above the art ---- */
-.enemy-header {
-  text-align: center;
-  width: 100%;
+.intent-dmg {
+  font-family: var(--font-body);
+  font-weight: 900;
+  font-size: 1rem;
+}
+
+/* Name + HP bar */
+.enemy-info {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  width: 100%;
+  min-width: 160px;
+  max-width: 200px;
 }
 
 .enemy-name {
   font-family: var(--font-headline);
+  font-size: 0.9rem;
   font-weight: 700;
-  font-size: 1rem;
   color: var(--arcane-gold);
   text-transform: uppercase;
   letter-spacing: 1px;
   text-shadow: 0 0 8px rgba(201,168,76,0.4);
 }
 
-/* HP bar */
 .enemy-hp-bar {
-  width: 160px;
-  background: var(--void);
+  width: 100%;
+  height: 16px;
+  background: rgba(0,0,0,0.6);
   border: 1px solid rgba(154,3,30,0.4);
   border-radius: 4px;
-  height: 18px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 0 6px rgba(154,3,30,0.2);
 }
 
 .enemy-hp-fill {
@@ -67,157 +82,89 @@
   align-items: center;
   justify-content: center;
   font-family: var(--font-body);
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 900;
   color: #fff;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.9);
 }
 
-/* Elemental / type badges */
-.enemy-badges {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.enemy-badge {
-  padding: 2px 8px;
-  background: var(--void);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 4px;
-  font-family: var(--font-label);
-  font-size: 0.6rem;
-  letter-spacing: 1px;
-  color: #bbb;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-/* ---- Intent bubble (floating above art) ---- */
-.enemy-intent-bubble {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(10,10,20,0.9);
-  border: 1px solid rgba(154,3,30,0.8);
+/* Block badge */
+.enemy-block-badge {
+  background: rgba(0,10,30,0.85);
+  border: 2px solid var(--mana-blue);
   border-radius: 20px;
-  padding: 4px 12px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  animation: float 2s infinite ease-in-out;
-  z-index: 20;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-  white-space: nowrap;
-}
-
-.intent-icon {
-  font-size: 1rem;
-}
-
-.intent-value {
-  color: var(--dragon-red);
+  padding: 3px 10px;
   font-family: var(--font-body);
+  font-size: 0.75rem;
   font-weight: 900;
-  font-size: 0.9rem;
-  text-shadow: 1px 1px 2px black;
+  color: var(--mana-blue);
+  box-shadow: 0 0 8px rgba(0,210,255,0.3);
+  position: absolute;
+  right: -16px;
+  top: 45%;
 }
 
-/* ---- Enemy "art" card ---- */
-.enemy-card {
+/* Sprite */
+.enemy-sprite-wrap {
   position: relative;
-  width: 180px;
-  height: 220px;
-  background: var(--bg-slate);
-  border: 2px solid rgba(68,68,68,0.8);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .enemy-sprite {
-  font-size: 5rem;
-  filter: drop-shadow(0 5px 15px rgba(0,0,0,0.7));
+  font-size: 7rem;
+  line-height: 1;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.9));
+  display: block;
 }
 
-/* Block shield badge */
-.enemy-block-shield {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background: var(--bg-slate);
-  border: 2px solid var(--mana-blue);
+/* Ground shadow */
+.enemy-shadow {
+  width: 80px;
+  height: 14px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, transparent 70%);
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 8px rgba(0,210,255,0.4);
+  margin-top: -10px;
+  filter: blur(3px);
 }
 
-.block-value {
-  font-size: 0.7rem;
-  font-weight: 900;
-  color: var(--mana-blue);
-  font-family: var(--font-body);
-}
-
-/* Status effects row */
-.enemy-stats {
-  width: 100%;
-  padding: 0 6px 6px;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-}
-
+/* Status effects */
 .enemy-statuses {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
   justify-content: center;
-  margin-top: 6px;
+  max-width: 180px;
 }
 
 .status {
   padding: 2px 7px;
   border-radius: 4px;
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   font-weight: 700;
   background: rgba(0,0,0,0.5);
   border: 1px solid rgba(255,255,255,0.1);
   font-family: var(--font-body);
 }
+.status.burn   { border-color: rgba(230,57,70,0.5);  color: var(--dragon-red); }
+.status.poison { border-color: rgba(46,204,113,0.5); color: var(--emerald-life); }
+.status.weak   { border-color: rgba(0,210,255,0.5);  color: var(--mana-blue); }
+.status.vuln   { border-color: rgba(154,3,30,0.5);   color: var(--crimson-blood); }
+.status.str    { border-color: rgba(201,168,76,0.5); color: var(--arcane-gold); }
 
-.status.burn       { border-color: rgba(230,57,70,0.5);  color: var(--dragon-red); }
-.status.poison     { border-color: rgba(46,204,113,0.5); color: var(--emerald-life); }
-.status.weak       { border-color: rgba(0,210,255,0.5);  color: var(--mana-blue); }
-.status.vuln       { border-color: rgba(154,3,30,0.5);   color: var(--crimson-blood); }
-.status.str        { border-color: rgba(201,168,76,0.5); color: var(--arcane-gold); }
-
-/* ---- Hit flash ---- */
+/* Hit flash */
 .hit-flash {
   position: absolute;
   inset: 0;
-  background: rgba(255, 0, 0, 0.45);
+  background: rgba(255,60,60,0.5);
+  border-radius: 50%;
   pointer-events: none;
-  border-radius: 12px;
   z-index: 5;
-  animation: flash 0.3s ease-out forwards;
 }
 
-/* ---- Animations ---- */
+/* Animations */
 @keyframes flash {
   from { opacity: 0.6; }
   to   { opacity: 0; }
 }
-
-/* shake and float are now handled by Framer Motion in EnemyComponent */

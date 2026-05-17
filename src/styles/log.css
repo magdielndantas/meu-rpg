@@ -40,3 +40,30 @@
 .log-status { color: #fdcb6e; border-left-color: #fdcb6e; }
 .log-card { color: var(--gold); font-weight: bold; border-left-color: var(--gold); }
 .log-system { color: #888; font-style: italic; opacity: 0.8; }
+
+/* Compact log — horizontal scrolling row in battlefield-info bar */
+.combat-log-compact {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  align-items: center;
+  flex: 1;
+  scrollbar-width: none;
+}
+.combat-log-compact::-webkit-scrollbar { display: none; }
+
+.log-entry-compact {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  white-space: nowrap;
+  opacity: 0.85;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: rgba(0,0,0,0.2);
+}
+.log-entry-compact.log-damage { color: #ff7675; }
+.log-entry-compact.log-block  { color: #74b9ff; }
+.log-entry-compact.log-heal   { color: #55efc4; }
+.log-entry-compact.log-status { color: #fdcb6e; }
+.log-entry-compact.log-card   { color: var(--gold); font-weight: bold; }
+.log-entry-compact.log-system { color: #888; font-style: italic; }
