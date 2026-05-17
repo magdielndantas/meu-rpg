@@ -48,6 +48,7 @@ export default function App() {
   const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
   const [playedCard, setPlayedCard] = useState<Card | null>(null);
   const [isMuted, setIsMuted] = useState(false);
+  const [turnBanner, setTurnBanner] = useState<'player' | 'enemy' | null>(null);
 
   const prevPlayerRef = useRef(game.player);
   const prevEnemiesRef = useRef(game.enemies);
@@ -104,6 +105,13 @@ export default function App() {
     else if (curr === 'victory') play('victory');
     else if (curr === 'defeat') play('defeat');
     else if (curr === 'rest') play('restEnter');
+    if (curr === 'enemy_turn') {
+      setTurnBanner('enemy');
+      setTimeout(() => setTurnBanner(null), 1600);
+    } else if (curr === 'player_turn' && prev === 'enemy_turn') {
+      setTurnBanner('player');
+      setTimeout(() => setTurnBanner(null), 1400);
+    }
   }, [game.phase]);
 
   // Card deal sound — when hand grows (new cards drawn)
@@ -361,6 +369,16 @@ export default function App() {
             <div className="battlefield-fog" />
           </div>
 
+          {/* Dungeon torches */}
+          <div className="torch torch-left" aria-hidden="true">
+            <div className="torch-glow" />
+            <div className="torch-flame" />
+          </div>
+          <div className="torch torch-right" aria-hidden="true">
+            <div className="torch-glow" />
+            <div className="torch-flame" />
+          </div>
+
           {/* Top info bar: pile counts + compact log */}
           <div className="battlefield-info">
             <span style={{ fontSize:'0.65rem', letterSpacing:'2px', textTransform:'uppercase', color:'rgba(201,168,76,0.4)', fontFamily:'var(--font-label)' }}>
@@ -524,6 +542,24 @@ export default function App() {
               >
                 Jogar Novamente
               </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Turn transition banner */}
+        <AnimatePresence>
+          {turnBanner && (
+            <motion.div
+              key={turnBanner}
+              className={`turn-banner turn-banner--${turnBanner}`}
+              initial={{ opacity: 0, scaleX: 0.3 }}
+              animate={{ opacity: 1, scaleX: 1 }}
+              exit={{ opacity: 0, scaleX: 0.3 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 24 }}
+            >
+              <div className="turn-banner-inner">
+                {turnBanner === 'enemy' ? '⚔ TURNO DO INIMIGO' : '✦ SEU TURNO'}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
