@@ -11,6 +11,7 @@ import MapScreen from './components/MapScreen';
 import RestScreen from './components/RestScreen';
 import ShopScreen from './components/ShopScreen';
 import { getRelic } from './game/relics';
+import { play, setMuted } from './audio/sounds';
 import './App.css';
 import './styles/floating-text.css';
 
@@ -46,9 +47,12 @@ export default function App() {
   const [showDeck, setShowDeck] = useState(false);
   const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
   const [playedCard, setPlayedCard] = useState<Card | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
 
   const prevPlayerRef = useRef(game.player);
   const prevEnemiesRef = useRef(game.enemies);
+  const prevPhaseRef = useRef(game.phase);
+  const prevHandLengthRef = useRef(game.player.hand.length);
 
   const addFloatingText = useCallback((text: string, x: number, y: number, type: FloatingText['type']) => {
     const id = Math.random().toString(36).slice(2, 9);
@@ -58,24 +62,51 @@ export default function App() {
     }, 1100);
   }, []);
 
+  // Floating text + damage sounds
   useEffect(() => {
     const p = game.player;
     const prevP = prevPlayerRef.current;
-    if (p.hp < prevP.hp) addFloatingText(`-${prevP.hp - p.hp}`, 200, 400, 'damage');
-    if (p.hp > prevP.hp) addFloatingText(`+${p.hp - prevP.hp}`, 200, 400, 'heal');
-    if (p.block > prevP.block) addFloatingText(`+${p.block - prevP.block}`, 200, 350, 'block');
+    if (p.hp < prevP.hp) { addFloatingText(`-${prevP.hp - p.hp}`, 200, 400, 'damage'); play('playerHit'); }
+    if (p.hp > prevP.hp) { addFloatingText(`+${p.hp - prevP.hp}`, 200, 400, 'heal');   play('heal'); }
+    if (p.block > prevP.block) { addFloatingText(`+${p.block - prevP.block}`, 200, 350, 'block'); play('block'); }
 
     game.enemies.forEach(e => {
       const prevE = prevEnemiesRef.current.find(pe => pe.id === e.id);
       if (prevE) {
-        if (e.hp < prevE.hp) addFloatingText(`-${prevE.hp - e.hp}`, 800, 300, 'damage');
-        if (e.block > prevE.block) addFloatingText(`+${e.block - prevE.block}`, 800, 250, 'block');
+        if (e.hp < prevE.hp) { addFloatingText(`-${prevE.hp - e.hp}`, 800, 300, 'damage'); play('enemyHit'); }
+        if (e.block > prevE.block) { addFloatingText(`+${e.block - prevE.block}`, 800, 250, 'block'); play('block'); }
       }
     });
 
     prevPlayerRef.current = p;
     prevEnemiesRef.current = game.enemies;
   }, [game.player, game.enemies, addFloatingText]);
+
+  // Phase change sounds
+  useEffect(() => {
+    const prev = prevPhaseRef.current;
+    const curr = game.phase;
+    if (prev === curr) return;
+    prevPhaseRef.current = curr;
+    if (curr === 'player_turn') play('turnStart');
+    else if (curr === 'enemy_turn') play('enemyTurn');
+    else if (curr === 'victory') play('victory');
+    else if (curr === 'defeat') play('defeat');
+    else if (curr === 'rest') play('restEnter');
+  }, [game.phase]);
+
+  // Card deal sound — when hand grows (new cards drawn)
+  useEffect(() => {
+    const prev = prevHandLengthRef.current;
+    const curr = game.player.hand.length;
+    if (curr > prev) {
+      const added = curr - prev;
+      for (let i = 0; i < added; i++) {
+        setTimeout(() => play('cardDraw'), i * 80);
+      }
+    }
+    prevHandLengthRef.current = curr;
+  }, [game.player.hand.length]);
 
   const handleCardClick = useCallback((cardId: string) => {
     if (game.phase !== 'player_turn' || playedCard) return;
@@ -90,6 +121,7 @@ export default function App() {
     );
     if (!needsTarget || game.enemies.length === 1) {
       const targetId = needsTarget ? game.enemies[0].id : '';
+      play(card.type === 'attack' ? 'cardAttack' : card.type === 'power' ? 'cardPower' : 'cardSkill');
       setPlayedCard(card);
       setTimeout(() => {
         setGame(g => playCard(g, cardId, targetId));
@@ -104,6 +136,7 @@ export default function App() {
     if (game.phase !== 'player_turn' || !game.selectedCard || playedCard) return;
     const card = game.player.hand.find(c => c.id === game.selectedCard);
     if (!card) return;
+    play(card.type === 'attack' ? 'cardAttack' : card.type === 'power' ? 'cardPower' : 'cardSkill');
     setPlayedCard(card);
     setTimeout(() => {
       setGame(g => playCard(g, g.selectedCard!, enemyId));
@@ -111,12 +144,12 @@ export default function App() {
     }, 560);
   }, [game, playedCard]);
 
-  const handleEndTurn    = useCallback(() => setGame(g => endTurn(g)), []);
+  const handleEndTurn    = useCallback(() => { play('endTurn'); setGame(g => endTurn(g)); }, []);
   const handleReward     = useCallback((card: Card | null) => setGame(g => collectReward(g, card)), []);
-  const handleSelectNode = useCallback((nodeId: string) => setGame(g => selectNode(g, nodeId)), []);
-  const handleHeal       = useCallback(() => setGame(g => restHeal(g)), []);
-  const handleUpgrade    = useCallback((cardId: string) => setGame(g => restUpgrade(g, cardId)), []);
-  const handleBuyCard    = useCallback((cardId: string) => setGame(g => buyCard(g, cardId)), []);
+  const handleSelectNode = useCallback((nodeId: string) => { play('nodeSelect'); setGame(g => selectNode(g, nodeId)); }, []);
+  const handleHeal       = useCallback(() => { play('heal'); setGame(g => restHeal(g)); }, []);
+  const handleUpgrade    = useCallback((cardId: string) => { play('cardSkill'); setGame(g => restUpgrade(g, cardId)); }, []);
+  const handleBuyCard    = useCallback((cardId: string) => { play('shopBuy'); setGame(g => buyCard(g, cardId)); }, []);
   const handleRemoveCard = useCallback((cardId: string) => setGame(g => removeCard(g, cardId)), []);
   const handleLeaveShop  = useCallback(() => setGame(g => leaveShop(g)), []);
   const handleRestart    = useCallback(() => setGame(createInitialState()), []);
@@ -175,6 +208,9 @@ export default function App() {
               <span>💰 {game.player.gold}</span>
               <button className="deck-btn" style={{ width: 'auto', padding: '4px 14px' }} onClick={() => setShowDeck(v => !v)}>
                 Deck ({game.player.deck.length})
+              </button>
+              <button className="mute-btn" title={isMuted ? 'Ativar sons' : 'Silenciar'} onClick={() => { setIsMuted(m => { setMuted(!m); return !m; }); }}>
+                {isMuted ? '🔇' : '🔊'}
               </button>
             </div>
           </header>
@@ -288,6 +324,9 @@ export default function App() {
           <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
             <span className="floor-badge">Andar {game.floor}</span>
             <span className="turn-badge">Turno {game.turn}</span>
+            <button className="mute-btn" title={isMuted ? 'Ativar sons' : 'Silenciar'} onClick={() => { setIsMuted(m => { setMuted(!m); return !m; }); }}>
+              {isMuted ? '🔇' : '🔊'}
+            </button>
           </div>
         </header>
 
