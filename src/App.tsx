@@ -375,16 +375,33 @@ export default function App() {
               <PlayerStats player={game.player} />
             </div>
             <div className="enemy-zone">
-              {game.enemies.map((enemy, i) => (
-                <div key={enemy.id} ref={el => { enemyFigureRefs.current[enemy.id] = el; }} style={{ display: 'contents' }}>
-                  <EnemyComponent
-                    enemy={enemy}
-                    selected={game.selectedCard !== null}
-                    onClick={() => handleEnemyClick(enemy.id)}
-                    entranceDelay={i * 0.12}
-                  />
-                </div>
-              ))}
+              <AnimatePresence>
+                {game.enemies.map((enemy, i) => (
+                  <motion.div
+                    key={enemy.id}
+                    ref={el => { enemyFigureRefs.current[enemy.id] = el; }}
+                    style={{ display: 'flex', alignItems: 'flex-end' }}
+                    exit={{
+                      opacity: [1, 1, 0],
+                      scale: [1, 1.18, 0.3],
+                      y: [0, -12, -40],
+                      filter: [
+                        'brightness(1) blur(0px)',
+                        'brightness(6) blur(0px)',
+                        'brightness(0) blur(14px)',
+                      ],
+                      transition: { duration: 0.65, times: [0, 0.18, 1], ease: 'easeOut' },
+                    }}
+                  >
+                    <EnemyComponent
+                      enemy={enemy}
+                      selected={game.selectedCard !== null}
+                      onClick={() => handleEnemyClick(enemy.id)}
+                      entranceDelay={i * 0.12}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
           </div>
         </div>
