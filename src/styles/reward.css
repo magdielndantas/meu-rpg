@@ -34,7 +34,9 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%);
+  background: linear-gradient(180deg, rgba(15, 12, 10, 0.35) 0%, rgba(10, 8, 5, 0.88) 75%, #060503 100%), url('/backgrounds/victory_bg.png') no-repeat center center;
+  background-size: cover;
+  background-attachment: fixed;
   color: #eee;
   gap: 36px;
   padding: 60px 40px;
@@ -122,16 +124,26 @@
 
 /* ---- Relic reward panel ---- */
 .relic-reward {
-  background: rgba(30, 24, 8, 0.7);
-  border: 1px solid var(--arcane-gold);
-  border-radius: 10px;
-  padding: 24px 32px;
+  background: linear-gradient(135deg, rgba(36, 28, 18, 0.93) 0%, rgba(22, 17, 12, 0.98) 100%);
+  border: 1px solid rgba(201,168,76,0.45);
+  border-radius: 8px;
+  padding: 28px 36px;
   width: 100%;
   max-width: 560px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 0 30px rgba(201,168,76,0.06), var(--shadow-glow-gold);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.85), inset 0 0 25px rgba(201,168,76,0.08), 0 0 15px rgba(201,168,76,0.2);
   backdrop-filter: blur(10px);
   position: relative;
   z-index: 1;
+  overflow: hidden;
+}
+
+.relic-reward::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  pointer-events: none;
 }
 
 .relic-reward h3 {

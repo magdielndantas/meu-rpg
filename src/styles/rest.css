@@ -29,7 +29,9 @@
   align-items: center;
   justify-content: flex-start;
   min-height: 100vh;
-  background: radial-gradient(ellipse 100% 60% at 50% 70%, #3d1a00 0%, #1a0d00 30%, #0a0a14 60%);
+  background: linear-gradient(180deg, rgba(15, 10, 5, 0.4) 0%, rgba(10, 8, 5, 0.88) 75%, #060503 100%), url('/backgrounds/rest_bg.png') no-repeat center center;
+  background-size: cover;
+  background-attachment: fixed;
   color: #eee;
   padding: 48px 40px 40px;
   position: relative;
@@ -103,32 +105,44 @@
 
 .rest-option {
   width: 300px;
-  background: rgba(10, 8, 2, 0.85);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(26, 20, 15, 0.93) 0%, rgba(16, 12, 9, 0.98) 100%);
+  border: 1px solid rgba(201,168,76,0.22);
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   cursor: pointer;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.7), inset 0 0 15px rgba(255, 100, 0, 0.02);
   transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
   padding: 36px 28px;
   text-align: center;
   backdrop-filter: blur(8px);
   animation: restGoldPulse 5s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.rest-option::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  pointer-events: none;
 }
 
 .rest-option:hover:not(.disabled) {
-  transform: translateY(-10px) scale(1.03);
-  border-color: var(--arcane-gold);
-  box-shadow: 0 24px 48px rgba(0,0,0,0.8), var(--shadow-glow-gold);
-  background: rgba(20, 14, 4, 0.95);
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(255,120,40,0.75);
+  box-shadow: 0 16px 36px rgba(0,0,0,0.85), 0 0 20px rgba(255,100,0,0.25), inset 0 0 20px rgba(255,100,0,0.06);
+  background: linear-gradient(135deg, rgba(38, 26, 18, 0.96) 0%, rgba(22, 15, 10, 0.98) 100%);
   animation: none;
 }
 
 .rest-option.disabled {
-  opacity: 0.3;
-  filter: grayscale(1);
+  opacity: 0.28;
+  filter: grayscale(0.85);
   cursor: not-allowed;
 }
 

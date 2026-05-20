@@ -27,7 +27,9 @@
   height: 100%;
   overflow-x: auto;
   overflow-y: hidden;
-  background: radial-gradient(ellipse at 50% 40%, #1a1a2e 0%, #0a0a14 100%);
+  background: linear-gradient(180deg, rgba(20, 16, 12, 0.4) 0%, rgba(10, 8, 6, 0.88) 75%, #050403 100%), url('/backgrounds/map_bg.png') no-repeat center center;
+  background-size: cover;
+  background-attachment: fixed;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -39,8 +41,8 @@
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 40% at 20% 60%, rgba(155,89,182,0.05) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 30%, rgba(0,210,255,0.03) 0%, transparent 50%);
+    radial-gradient(ellipse 80% 40% at 20% 60%, rgba(155,89,182,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 30%, rgba(0,210,255,0.02) 0%, transparent 50%);
   pointer-events: none;
   animation: mistDrift 14s ease-in-out infinite;
   z-index: 0;
@@ -139,47 +141,61 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.12);
+  border: 2px solid rgba(139, 115, 85, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: default;
-  background: rgba(10, 10, 20, 0.85);
+  background: linear-gradient(135deg, #1c1813 0%, #0d0b08 100%);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.65), inset 0 2px 4px rgba(255,255,255,0.05), inset 0 -2px 4px rgba(0,0,0,0.5);
   transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
   position: relative;
   backdrop-filter: blur(4px);
 }
 
+.map-node::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  pointer-events: none;
+}
+
 /* ---- Type variants ---- */
 .map-node.type-enemy {
-  background: #3d0000;
-  border-color: var(--crimson-blood);
+  background: linear-gradient(135deg, #3d1414 0%, #170707 100%);
+  border-color: rgba(230, 57, 70, 0.55);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.7), inset 0 0 10px rgba(230, 57, 70, 0.15);
 }
 
 .map-node.type-elite {
   width: 72px;
   height: 72px;
-  background: #2a0050;
-  border-color: var(--void-purple);
-  box-shadow: 0 0 12px rgba(155,89,182,0.3);
+  background: linear-gradient(135deg, #2b113d 0%, #0f0517 100%);
+  border-color: rgba(155, 89, 182, 0.6);
+  box-shadow: 0 6px 18px rgba(155,89,182,0.25), inset 0 0 12px rgba(155,89,182,0.2);
 }
 
 .map-node.type-rest {
-  background: #3d1a00;
-  border-color: #e07000;
+  background: linear-gradient(135deg, #3d1f11 0%, #1a0b05 100%);
+  border-color: rgba(224, 112, 0, 0.6);
+  box-shadow: 0 6px 15px rgba(224, 112, 0, 0.2), inset 0 0 10px rgba(224, 112, 0, 0.15);
 }
 
 .map-node.type-shop {
-  background: #3d2a00;
-  border-color: var(--arcane-gold);
+  background: linear-gradient(135deg, #302613 0%, #140f07 100%);
+  border-color: rgba(201, 168, 76, 0.6);
+  box-shadow: 0 6px 15px rgba(201, 168, 76, 0.25), inset 0 0 10px rgba(201, 168, 76, 0.15);
 }
 
 .map-node.type-boss {
   width: 80px;
   height: 80px;
-  background: #3d0000;
+  background: linear-gradient(135deg, #4d1010 0%, #1c0505 100%);
   border-color: var(--dragon-red);
   border-width: 3px;
+  box-shadow: 0 8px 24px rgba(230, 57, 70, 0.35), inset 0 0 15px rgba(230, 57, 70, 0.3);
   animation: bossPulse 2s ease-in-out infinite;
 }
 
@@ -188,9 +204,9 @@
   border-color: var(--runic-gold);
   border-width: 3px;
   box-shadow:
-    0 0 20px rgba(241,196,15,0.7),
-    0 0 40px rgba(241,196,15,0.3),
-    inset 0 0 10px rgba(241,196,15,0.1);
+    0 0 20px rgba(241,196,15,0.75),
+    0 0 40px rgba(241,196,15,0.35),
+    inset 0 0 12px rgba(241,196,15,0.2);
 }
 
 .map-node.selectable {
@@ -200,11 +216,12 @@
 
 .map-node.selectable:hover {
   transform: scale(1.12);
+  border-color: var(--runic-gold);
 }
 
 .map-node.disabled {
-  opacity: 0.35;
-  filter: grayscale(1);
+  opacity: 0.25;
+  filter: grayscale(0.95) contrast(0.85);
   cursor: not-allowed;
 }
 

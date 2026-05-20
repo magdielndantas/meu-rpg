@@ -17,7 +17,9 @@
   flex-direction: column;
   align-items: center;
   padding: 0 0 60px;
-  background: linear-gradient(180deg, #1a1409 0%, #0f0d06 40%, #0a0a14 100%);
+  background: linear-gradient(180deg, rgba(20, 16, 12, 0.5) 0%, rgba(10, 8, 5, 0.92) 80%, #060503 100%), url('/backgrounds/shop_bg.png') no-repeat center center;
+  background-size: cover;
+  background-attachment: fixed;
   min-height: 100vh;
   color: #eee;
   position: relative;
@@ -184,55 +186,69 @@
 
 .service-card {
   width: 300px;
-  background: rgba(15, 12, 4, 0.85);
-  border: 1px solid rgba(201,168,76,0.2);
-  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(28, 22, 14, 0.92) 0%, rgba(18, 14, 9, 0.97) 100%);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 8px;
   padding: 36px;
   text-align: center;
   cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.65), inset 0 0 20px rgba(201,168,76,0.03);
   transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
   backdrop-filter: blur(8px);
+  position: relative;
+  overflow: hidden;
+}
+
+.service-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  pointer-events: none;
 }
 
 .service-card:hover {
   border-color: var(--arcane-gold);
-  background: rgba(30, 22, 6, 0.95);
+  background: linear-gradient(135deg, rgba(38, 30, 20, 0.95) 0%, rgba(24, 18, 12, 0.98) 100%);
   transform: translateY(-8px);
-  box-shadow: var(--shadow-panel), var(--shadow-glow-gold);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 15px rgba(201,168,76,0.25), inset 0 0 20px rgba(201,168,76,0.05);
 }
 
 .service-card.disabled {
-  opacity: 0.35;
+  opacity: 0.3;
   cursor: not-allowed;
-  filter: grayscale(0.5);
+  filter: grayscale(0.8);
 }
 
 .service-card.disabled:hover {
   transform: none;
   border-color: rgba(201,168,76,0.2);
   box-shadow: none;
+  background: linear-gradient(135deg, rgba(28, 22, 14, 0.92) 0%, rgba(18, 14, 9, 0.97) 100%);
 }
 
 .service-icon {
-  font-size: 3.5rem;
+  font-size: 3.8rem;
   margin-bottom: 20px;
-  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6));
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.7));
 }
 
 .service-card h3 {
   font-family: var(--font-label);
   color: var(--arcane-gold);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 2px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .service-card p {
-  color: #777;
+  color: #a49f96;
   font-family: var(--font-body);
   font-size: 0.85rem;
-  line-height: 1.5;
+  line-height: 1.6;
   margin-bottom: 16px;
 }
 
